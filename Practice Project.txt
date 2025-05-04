@@ -1,0 +1,13 @@
+Weather Dashboard
+Recipe Finder
+Weather App
+Movie Search
+News Aggregator
+Trivia Game
+Music Player
+Language Translator
+Image Gallery with Random Images
+GitHub User Lookup
+Authentication
+Google Authentication
+Dictionary App
