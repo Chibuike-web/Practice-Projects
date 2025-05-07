@@ -9,12 +9,32 @@ const PORT = process.env.PORT || 1234;
 app.use(cors());
 app.use(express.json());
 
-app.post("/validate", (req: any, res: any) => {
+interface Errors {
+	name: string;
+	email: string;
+	password: string;
+	checked: string;
+}
+
+app.post("/auth/register", (req: any, res: any) => {
 	const { name, email, password, checked } = req.body;
-	if (name && email && password && checked) {
-		return res.json({ message: "Authenticated" });
+	const errors: Errors = { name: "", email: "", password: "", checked: "" };
+	if (!name) errors.name = "Name is required";
+	if (!email) errors.email = "Email is required";
+	else {
+		const emailRegex = /^\S+@\S+\.\S+$/;
+		if (!emailRegex.test(email)) {
+			errors.email = "Invalid email address";
+		}
 	}
-	return res.status(400).json({ message: "Missing required fields" });
+	if (!password) errors.password = "Password is required";
+	if (!checked) errors.checked = "You must agree to terms";
+
+	if (Object.keys(errors).length > 0) {
+		return res.status(400).json({ errors });
+	}
+
+	return res.status(200).json({ message: "Authenticated" });
 });
 
 app.listen(PORT, () => {

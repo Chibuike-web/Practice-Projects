@@ -12,13 +12,20 @@ export default function Signup() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [checked, setChecked] = useState(false);
-	const { setAuthenticated } = useAuth();
-	const [formData, setFormData] = useState<FormData>({
+	const [errors, setErrors] = useState<FormErrors>({
 		name: "",
 		email: "",
 		password: "",
 		checked: false,
 	});
+	const { setAuthenticated } = useAuth();
+
+	interface FormErrors {
+		name: string;
+		email: string;
+		password: string;
+		checked: boolean;
+	}
 
 	type FormData = {
 		name: string;
@@ -27,34 +34,64 @@ export default function Signup() {
 		checked: boolean;
 	};
 
-	const handleSubmit = (e: FormEvent) => {
-		e.preventDefault();
-		if (!email || !name || !password || !checked) {
-			return;
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { id, value, checked } = e.target;
+
+		if (id === "name") {
+			setName(value);
+			if (errors.name && value.trim() !== "") {
+				setErrors((prev) => ({ ...prev, name: "" }));
+			}
+		} else if (id === "email") {
+			setEmail(value);
+			if (errors.email && value.trim() !== "") {
+				setErrors((prev) => ({ ...prev, email: "" }));
+			}
+		} else if (id === "password") {
+			setPassword(value);
+			if (errors.password && value.trim() !== "") {
+				setErrors((prev) => ({ ...prev, password: "" }));
+			}
+		} else if (id === "checkbox") {
+			setChecked(checked);
+			if (errors.checked && checked) {
+				setErrors((prev) => ({ ...prev, checked: false }));
+			}
 		}
-
-		const newFormData = { name, email, password, checked };
-		setFormData(newFormData);
-		auth(newFormData);
-
-		setEmail("");
-		setName("");
-		setPassword("");
-		setChecked(false);
 	};
 
-	const auth = async (data: FormData) => {
+	const handleSubmit = async (e: FormEvent) => {
+		e.preventDefault();
+		const newFormData = { name, email, password, checked };
+		const success = await auth(newFormData);
+		if (success) {
+			setEmail("");
+			setName("");
+			setPassword("");
+			setChecked(false);
+			setErrors({ name: "", email: "", password: "", checked: false });
+			setAuthenticated();
+		}
+	};
+
+	const auth = async (formData: FormData) => {
 		try {
-			const res = await fetch("http://localhost:1234/validate", {
+			const res = await fetch("http://localhost:1234/auth/register", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
+				body: JSON.stringify(formData),
 			});
-			const result = await res.json();
-			console.log(result);
-			setAuthenticated();
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				setErrors(data.errors);
+				return false;
+			}
+			return true;
 		} catch (error: any) {
 			console.error(`Failed to authenticate: ${error.message}`);
+			return false;
 		}
 	};
 
@@ -68,10 +105,12 @@ export default function Signup() {
 			</div>
 
 			<form onSubmit={handleSubmit} className="flex flex-col gap-[16px] w-full">
-				<NameField name={name} setName={setName} />
-				<Email email={email} setEmail={setEmail} />
-				<Password password={password} setPassword={setPassword} />
-				<TermsCheckbox checked={checked} setChecked={setChecked} />
+				<NameField name={name} handleChange={handleChange} />
+				{errors.name && <p className="text-red-500">{errors.name}</p>}
+				<Email email={email} handleChange={handleChange} />
+				{errors.email && <p className="text-red-500">{errors.email}</p>}
+				<Password password={password} handleChange={handleChange} />
+				<TermsCheckbox checked={checked} handleChange={handleChange} />
 				<Button variant="primary" type="submit" className="mt-10">
 					Sign up
 				</Button>

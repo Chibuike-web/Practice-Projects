@@ -1,13 +1,13 @@
 export default function TermsCheckbox({
 	checked,
-	setChecked,
+	handleChange,
 }: {
 	checked: boolean;
-	setChecked: (value: boolean) => void;
+	handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
 	return (
 		<label className="flex gap-[4px] items-center text-[14px] text-light-gray">
-			<input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} />I
+			<input id="checkbox" type="checkbox" checked={checked} onChange={(e) => handleChange(e)} />I
 			agree to the Terms of Services & Privacy Notice
 		</label>
 	);

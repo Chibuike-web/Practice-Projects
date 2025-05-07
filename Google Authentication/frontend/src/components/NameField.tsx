@@ -2,10 +2,10 @@ import { User } from "lucide-react";
 
 export default function NameField({
 	name,
-	setName,
+	handleChange,
 }: {
 	name: string;
-	setName: (value: string) => void;
+	handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
 	return (
 		<fieldset className="flex flex-col gap-2">
@@ -23,7 +23,7 @@ export default function NameField({
 					type="text"
 					placeholder="Enter your name"
 					value={name}
-					onChange={(e) => setName(e.target.value)}
+					onChange={(e) => handleChange(e)}
 					className="text-sm pl-11 pr-4 py-3 border border-input-stroke bg-very-light-gray rounded-md w-full placeholder:text-light-gray focus:border-primary"
 				/>
 			</div>
