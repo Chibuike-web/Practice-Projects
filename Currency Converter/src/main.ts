@@ -3,6 +3,7 @@ import fetchData from "./fetchData";
 const submitBtn = document.getElementById("submit-btn");
 const amount = document.getElementById("amount");
 const output = document.getElementById("output");
+const loading = document.getElementById("loading");
 
 submitBtn?.addEventListener("click", (e) => {
 	e.preventDefault();
@@ -13,9 +14,18 @@ submitBtn?.addEventListener("click", (e) => {
 	const currentValue = currentSelect.value;
 	const targetValue = targetSelect.value;
 
-	console.log(currentValue, targetValue);
+	if (output?.classList.contains("hidden")) {
+		if (loading) {
+			loading.classList.remove("hidden");
+		}
+	}
 
-	fetchData().then((data) => calculateExchange(data, currentValue, targetValue));
+	fetchData()
+		.then((data) => calculateExchange(data, currentValue, targetValue))
+		.catch((err) => {
+			console.error("Fetch error:", err);
+			if (loading) loading.innerHTML = `Failed to fetch data.`;
+		});
 });
 
 function calculateExchange(data: any, currentOption: string, targetOption: string) {
@@ -36,6 +46,7 @@ function calculateExchange(data: any, currentOption: string, targetOption: strin
 		const formattedOutput = formatter.format(convertedAmount);
 
 		if (output) {
+			loading?.classList.add("hidden");
 			output.classList.remove("hidden");
 			output.classList.add("flex");
 			output.innerHTML = `
