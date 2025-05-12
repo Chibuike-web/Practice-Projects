@@ -30,13 +30,13 @@
 body {
 	font-family: Inter;
 	background-color: var(--body);
-	width: 100vw;
-	height: 100vh;
-	justify-items: center;
-	align-content: center;
 	line-height: 1.2;
 }
 
 input:focus {
 	outline: none;
+}
+
+input:invalid:focus {
+	border-color: #fb2c36;
 }

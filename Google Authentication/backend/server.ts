@@ -10,12 +10,22 @@ app.use(cors());
 app.use(express.json());
 
 interface Errors {
+	name?: string;
+	email: string;
+	password: string;
+	checked?: string;
+}
+
+interface User {
 	name: string;
 	email: string;
 	password: string;
 	checked: string;
 }
 
+const users: User[] = [];
+
+// Register
 app.post("/auth/register", (req: any, res: any) => {
 	const { name, email, password, checked } = req.body;
 	const errors: Errors = { name: "", email: "", password: "", checked: "" };
@@ -30,11 +40,30 @@ app.post("/auth/register", (req: any, res: any) => {
 	if (!password) errors.password = "Password is required";
 	if (!checked) errors.checked = "You must agree to terms";
 
-	if (Object.keys(errors).length > 0) {
+	const hasErrors = Object.values(errors).some((val) => val !== "" && val !== false);
+	if (hasErrors) {
 		return res.status(400).json({ errors });
 	}
 
-	return res.status(200).json({ message: "Authenticated" });
+	users.push({ name, email, password, checked });
+	console.log(users);
+	return res.status(200).json({ message: "User Registered" });
+});
+
+app.post("/auth/login", (req: any, res: any) => {
+	const { email, password } = req.body;
+	const errors: Errors = { email: "", password: "" };
+	const user = users.find((user) => user.email === email);
+	if (!user) {
+		errors.email = "Email not found";
+		return res.status(400).json({ errors });
+	}
+
+	if (user.password !== password) {
+		errors.password = "Incorrect password";
+		return res.status(400).json({ errors });
+	}
+	return res.status(200).json({ message: "User Authenticated" });
 });
 
 app.listen(PORT, () => {

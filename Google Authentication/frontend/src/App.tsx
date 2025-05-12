@@ -5,25 +5,27 @@ import Signup from "./pages/Signup";
 import { useLocation, useNavigate } from "react-router";
 import { Routes, Route } from "react-router";
 import { useAuth } from "./store/useAuth";
+import Login from "./pages/Login";
 
 export default function App() {
-	const { authenticated, setAuthenticated } = useAuth();
+	// const { authenticated, setAuthenticated } = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	useEffect(() => {
-		if (authenticated) {
-			navigate("/");
-		} else {
-			navigate("/signup");
-		}
-	}, [authenticated, location.pathname, navigate]);
+	// useEffect(() => {
+	// 	if (authenticated) {
+	// 		navigate("/");
+	// 	} else {
+	// 		navigate("/signup");
+	// 	}
+	// }, [authenticated, location.pathname, navigate]);
 
 	return (
 		<Routes>
 			<Route path="/" element={<Home />} />
 			<Route path="/signup" element={<Signup />} />
 			<Route path="*" element={<NotFound />} />
+			<Route path="/login" element={<Login />} />
 		</Routes>
 	);
 }

@@ -16,6 +16,7 @@ export default function Email({
 					id="email"
 					type="text"
 					placeholder="Enter your email address"
+					required
 					value={email}
 					className="text-[14px] pl-[44px] border border-input-stroke py-[14px] pr-[14px] bg-very-light-gray rounded-[6px] w-full placeholder:text-[14px] placeholder:text-light-gray focus:border-primary"
 					onChange={(e) => handleChange(e)}
