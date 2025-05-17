@@ -1,4 +1,5 @@
 import fetchData from "./fetchData";
+import "./components/select";
 
 const submitBtn = document.getElementById("submit-btn");
 const amount = document.getElementById("amount");
