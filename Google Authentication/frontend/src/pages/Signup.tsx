@@ -5,8 +5,9 @@ import Password from "../components/Password";
 import TermsCheckbox from "../components/TermsCheckbox";
 import Button from "../components/Button";
 import { FormEvent } from "react";
-import { useAuth } from "../store/useAuth";
 import { GoogleIcon } from "../components/Icons";
+import { useNavigate } from "react-router";
+import { useSignUp } from "../store/useSignUp";
 
 export default function Signup() {
 	const [name, setName] = useState("");
@@ -19,7 +20,8 @@ export default function Signup() {
 		password: "",
 		checked: false,
 	});
-	const { setAuthenticated } = useAuth();
+	const navigate = useNavigate();
+	const { setSignUp } = useSignUp();
 
 	interface FormErrors {
 		name: string;
@@ -71,7 +73,7 @@ export default function Signup() {
 			setPassword("");
 			setChecked(false);
 			setErrors({ name: "", email: "", password: "", checked: false });
-			setAuthenticated();
+			setSignUp();
 		}
 	};
 

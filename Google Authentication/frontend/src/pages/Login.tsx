@@ -3,6 +3,7 @@ import Password from "../components/Password";
 import Button from "../components/Button";
 import { FormEvent, useState } from "react";
 import { GoogleIcon } from "../components/Icons";
+import { useAuth } from "../store/useAuth";
 
 interface FormErrors {
 	email: string;
@@ -21,6 +22,7 @@ export default function Login() {
 		email: "",
 		password: "",
 	});
+	const { setAuthenticated } = useAuth();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { id, value } = e.target;
@@ -53,6 +55,7 @@ export default function Login() {
 				setEmail("");
 				setPassword("");
 				setErrors({ email: "", password: "" });
+				setAuthenticated();
 			}
 		} catch (error: any) {
 			console.error(`Failed to authenticate: ${error.message}`);
