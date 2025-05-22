@@ -30,3 +30,28 @@ input:focus {
 select:focus {
 	outline: none;
 }
+
+.custom-select {
+	appearance: none;
+	position: relative;
+}
+
+.custom-select-wrapper {
+	position: relative;
+	display: inline-block;
+}
+
+.custom-select-wrapper::after {
+	content: "";
+	background-image: url("./assets/arrow-down-s-line.svg");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	position: absolute;
+	pointer-events: none;
+	top: 50%;
+	right: 10px;
+	transform: translateY(-50%);
+	width: 24px;
+	height: 24px;
+}

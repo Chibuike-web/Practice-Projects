@@ -50,7 +50,7 @@ const root = document.getElementById("app");
 const dropDownContainer = document.createElement("div");
 dropDownContainer.id = "dropdown-container";
 dropDownContainer.className =
-	"w-full bg-white h-[360px] overflow-y-auto rounded-[1rem] border border-[#e6e6e6] p-[12px]";
+	"absolute bottom-[1rem] w-full bg-white h-[360px] overflow-y-auto rounded-[1rem] border border-[#e6e6e6] p-[12px]";
 
 function createDropDown() {
 	currencyOptions.forEach(({ value, label }, index) => {
@@ -64,7 +64,8 @@ function createDropDown() {
 
 function createSelectBtn() {
 	const selectContainer = document.createElement("div");
-	selectContainer.className = "w-full max-w-[500px] mt-8 justify-items-center content-center";
+	selectContainer.className =
+		"relative w-full max-w-[500px] mt-8 justify-items-center content-center";
 	selectContainer.id = "select-container";
 
 	selectContainer.innerHTML = `
