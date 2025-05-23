@@ -15,21 +15,21 @@ export default function PageRoutes() {
 	const location = useLocation();
 
 	useEffect(() => {
-		if (authenticated) {
-			navigate("/");
-		} else if (signUp) {
+		if (authenticated && location.pathname !== "/") {
+			navigate("/", { replace: true });
+		} else if (signUp && location.pathname !== "/login") {
 			navigate("/login");
-		} else {
-			navigate("/signup");
+		} else if (!authenticated && !signUp && location.pathname !== "/signup") {
+			navigate("/signup", { replace: true });
 		}
-	}, [authenticated, location.pathname, navigate]);
+	}, [authenticated, signUp, location.pathname, navigate]);
 
 	return (
 		<Routes>
 			<Route path="/" element={<Home />} />
 			<Route path="/signup" element={<Signup />} />
-			<Route path="*" element={<NotFound />} />
 			<Route path="/login" element={<Login />} />
+			<Route path="*" element={<NotFound />} />
 		</Routes>
 	);
 }

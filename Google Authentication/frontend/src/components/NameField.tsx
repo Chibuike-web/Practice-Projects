@@ -1,11 +1,14 @@
 import { User } from "lucide-react";
+import clsx from "clsx";
 
 export default function NameField({
 	name,
 	handleChange,
+	error,
 }: {
 	name: string;
 	handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	error: string;
 }) {
 	return (
 		<fieldset className="flex flex-col gap-2">

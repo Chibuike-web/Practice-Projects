@@ -6,7 +6,6 @@ import TermsCheckbox from "../components/TermsCheckbox";
 import Button from "../components/Button";
 import { FormEvent } from "react";
 import { GoogleIcon } from "../components/Icons";
-import { useNavigate } from "react-router";
 import { useSignUp } from "../store/useSignUp";
 
 export default function Signup() {
@@ -18,16 +17,16 @@ export default function Signup() {
 		name: "",
 		email: "",
 		password: "",
-		checked: false,
+		checked: "",
 	});
-	const navigate = useNavigate();
+
 	const { setSignUp } = useSignUp();
 
 	interface FormErrors {
 		name: string;
 		email: string;
 		password: string;
-		checked: boolean;
+		checked: string;
 	}
 
 	type FormData = {
@@ -58,13 +57,41 @@ export default function Signup() {
 		} else if (id === "checkbox") {
 			setChecked(checked);
 			if (errors.checked && checked) {
-				setErrors((prev) => ({ ...prev, checked: false }));
+				setErrors((prev) => ({ ...prev, checked: "" }));
 			}
 		}
 	};
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
+
+		// Basic Validation
+		if (!name) setErrors((prev) => ({ ...prev, name: "Name is required" }));
+		if (!email) setErrors((prev) => ({ ...prev, email: "Email is required" }));
+		if (!password) setErrors((prev) => ({ ...prev, name: "Password is required" }));
+		if (!checked) setErrors((prev) => ({ ...prev, checked: "You must agree to terms" }));
+
+		// Email Validation
+		const emailRegex = /^\S+@\S+\.\S+$/;
+		if (email.length === 0) {
+			setErrors((prev) => ({ ...prev, email: "Email is required" }));
+		} else if (!emailRegex.test(email)) {
+			setErrors((prev) => ({ ...prev, email: "Invalid email address" }));
+		} else if (email.length < 6) {
+			setErrors((prev) => ({ ...prev, email: "Email should be minimum 6 characters" }));
+		} else if (email.indexOf(" ") >= 0) {
+			setErrors((prev) => ({ ...prev, email: "Email cannot contain spaces" }));
+		} else {
+			setErrors((prev) => ({ ...prev, email: "" }));
+		}
+
+		// Password validation
+		if (password.length < 8) {
+			setErrors((prev) => ({ ...prev, password: "Password must be at least 8 characters" }));
+		} else {
+			setErrors((prev) => ({ ...prev, password: "" }));
+		}
+
 		const newFormData = { name, email, password, checked };
 		const success = await auth(newFormData);
 		if (success) {
@@ -72,7 +99,7 @@ export default function Signup() {
 			setName("");
 			setPassword("");
 			setChecked(false);
-			setErrors({ name: "", email: "", password: "", checked: false });
+			setErrors({ name: "", email: "", password: "", checked: "" });
 			setSignUp();
 		}
 	};
@@ -110,14 +137,17 @@ export default function Signup() {
 
 				<form onSubmit={handleSubmit} className="flex flex-col gap-[16px] w-full">
 					<div>
-						<NameField name={name} handleChange={handleChange} />
+						<NameField name={name} handleChange={handleChange} error={errors.name} />
 						{errors.name && <p className="text-red-500 mt-[4px]">{errors.name}</p>}
 					</div>
 					<div>
 						<Email email={email} handleChange={handleChange} />
 						{errors.email && <p className="text-red-500 mt-[4px]">{errors.email}</p>}
 					</div>
-					<Password password={password} handleChange={handleChange} />
+					<div>
+						<Password password={password} handleChange={handleChange} />
+						{errors.password && <p className="text-red-500 mt-[4px]">{errors.password}</p>}
+					</div>
 					<div>
 						<TermsCheckbox checked={checked} handleChange={handleChange} />
 						{errors.checked && <p className="text-red-500 mt-[4px]">{errors.checked}</p>}
