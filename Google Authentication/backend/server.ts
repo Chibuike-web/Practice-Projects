@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,7 @@ interface Errors {
 }
 
 interface User {
+	id: string;
 	name: string;
 	email: string;
 	password: string;
@@ -28,24 +30,13 @@ const users: User[] = [];
 // Register
 app.post("/auth/register", (req: any, res: any) => {
 	const { name, email, password, checked } = req.body;
-	const errors: Errors = { name: "", email: "", password: "", checked: "" };
-	if (!name) errors.name = "Name is required";
-	if (!email) errors.email = "Email is required";
-	else {
-		const emailRegex = /^\S+@\S+\.\S+$/;
-		if (!emailRegex.test(email)) {
-			errors.email = "Invalid email address";
-		}
-	}
-	if (!password) errors.password = "Password is required";
-	if (!checked) errors.checked = "You must agree to terms";
 
-	const hasErrors = Object.values(errors).some((val) => val !== "" && val !== false);
-	if (hasErrors) {
-		return res.status(400).json({ errors });
+	const existingUser = users.find((user) => user.email === email);
+	if (existingUser) {
+		return res.status(400).json({ message: "User already exists" });
 	}
 
-	users.push({ name, email, password, checked });
+	users.push({ id: uuidv4(), name, email, password, checked });
 	console.log(users);
 	return res.status(200).json({ message: "User Registered" });
 });
