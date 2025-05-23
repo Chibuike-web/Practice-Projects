@@ -1,11 +1,14 @@
 import { Lock, EyeOff, EyeIcon } from "lucide-react";
+import clsx from "clsx";
 import { useState } from "react";
 export default function Password({
 	password,
 	handleChange,
+	error,
 }: {
 	password: string;
 	handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	error: string;
 }) {
 	const [showPassword, setShowPassword] = useState(false);
 	return (
@@ -19,7 +22,11 @@ export default function Password({
 					placeholder="Enter your password"
 					value={password}
 					required
-					className="text-[14px] px-[44px] border border-input-stroke py-[14px] bg-very-light-gray rounded-[6px] w-full placeholder:text-[14px] placeholder:text-light-gray focus:border-primary"
+					className={clsx(
+						"text-sm pl-11 pr-4 py-3 border",
+						error !== "" ? "border-red-500" : "border-input-stroke",
+						"bg-very-light-gray rounded-md w-full placeholder:text-light-gray focus:border-primary"
+					)}
 					onChange={(e) => handleChange(e)}
 				/>
 				{showPassword ? (

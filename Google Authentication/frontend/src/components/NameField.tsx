@@ -28,7 +28,11 @@ export default function NameField({
 					value={name}
 					required
 					onChange={(e) => handleChange(e)}
-					className="text-sm pl-11 pr-4 py-3 border border-input-stroke bg-very-light-gray rounded-md w-full placeholder:text-light-gray focus:border-primary"
+					className={clsx(
+						"text-sm pl-11 pr-4 py-3 border",
+						error !== "" ? "border-red-500" : "border-input-stroke",
+						"bg-very-light-gray rounded-md w-full placeholder:text-light-gray focus:border-primary"
+					)}
 				/>
 			</div>
 		</fieldset>

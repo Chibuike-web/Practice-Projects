@@ -33,6 +33,7 @@ app.post("/auth/register", (req: any, res: any) => {
 
 	const existingUser = users.find((user) => user.email === email);
 	if (existingUser) {
+		console.log("User exists");
 		return res.status(400).json({ message: "User already exists" });
 	}
 

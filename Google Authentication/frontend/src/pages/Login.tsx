@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import { FormEvent, useState } from "react";
 import { GoogleIcon } from "../components/Icons";
 import { useAuth } from "../store/useAuth";
+import { Link } from "react-router";
 
 interface FormErrors {
 	email: string;
@@ -70,11 +71,11 @@ export default function Login() {
 				</div>
 				<form onSubmit={handleSubmit} className="flex flex-col gap-[16px] w-full">
 					<div>
-						<Email email={email} handleChange={handleChange} />
+						<Email email={email} handleChange={handleChange} error={errors.email} />
 						{errors.email && <p className="text-red-500 mt-[4px]">{errors.email}</p>}
 					</div>
 					<div>
-						<Password password={password} handleChange={handleChange} />
+						<Password password={password} handleChange={handleChange} error={errors.password} />
 						{errors.password && <p className="text-red-500 mt-[4px]">{errors.password}</p>}
 					</div>
 
@@ -84,7 +85,9 @@ export default function Login() {
 				</form>
 				<div className="flex gap-[4px] justify-center mt-4">
 					<p className="text-light-gray">Don’t have an account?</p>
-					<span className="text-primary font-medium">Sign up</span>
+					<Link to="signup">
+						<button className="text-primary font-medium">Sign up</button>
+					</Link>
 				</div>
 
 				<div className="flex items-center gap-[16px] text-dark-gray font-medium mb-8 mt-4">

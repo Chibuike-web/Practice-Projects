@@ -7,6 +7,7 @@ import Button from "../components/Button";
 import { FormEvent } from "react";
 import { GoogleIcon } from "../components/Icons";
 import { useSignUp } from "../store/useSignUp";
+import { Link } from "react-router";
 
 export default function Signup() {
 	const [name, setName] = useState("");
@@ -19,6 +20,7 @@ export default function Signup() {
 		password: "",
 		checked: "",
 	});
+	const [isUserExist, setIsUserExist] = useState("");
 
 	const { setSignUp } = useSignUp();
 
@@ -115,9 +117,14 @@ export default function Signup() {
 			const data = await res.json();
 
 			if (!res.ok) {
-				setErrors(data.errors);
+				if (data.errors) {
+					setErrors(data.errors);
+				} else if (data.message) {
+					setIsUserExist(data.message);
+				}
 				return false;
 			}
+			setIsUserExist("");
 			return true;
 		} catch (error: any) {
 			console.error(`Failed to register: ${error.message}`);
@@ -129,6 +136,7 @@ export default function Signup() {
 		<section className="h-screen w-screen content-center justify-items-center">
 			<div className="max-w-[500px] w-full flex flex-col px-4 md:px-0">
 				<div className="flex flex-col gap-[12px] mb-[40px] w-full">
+					{isUserExist && <p className="text-red-500">{isUserExist}</p>}
 					<h1 className="text-[32px] font-bold text-dark-gray">Sign up</h1>
 					<p className="text-dark-gray">
 						Let’s get you all set up so you can access your personal account.
@@ -141,11 +149,11 @@ export default function Signup() {
 						{errors.name && <p className="text-red-500 mt-[4px]">{errors.name}</p>}
 					</div>
 					<div>
-						<Email email={email} handleChange={handleChange} />
+						<Email email={email} handleChange={handleChange} error={errors.email} />
 						{errors.email && <p className="text-red-500 mt-[4px]">{errors.email}</p>}
 					</div>
 					<div>
-						<Password password={password} handleChange={handleChange} />
+						<Password password={password} handleChange={handleChange} error={errors.password} />
 						{errors.password && <p className="text-red-500 mt-[4px]">{errors.password}</p>}
 					</div>
 					<div>
@@ -159,7 +167,10 @@ export default function Signup() {
 
 				<div className="flex gap-[4px] justify-center mt-4">
 					<p className="text-light-gray">Have an account already?</p>
-					<span className="text-primary font-medium">Log in</span>
+					<Link to="/login">
+						{" "}
+						<button className="text-primary font-medium">Log in</button>
+					</Link>
 				</div>
 
 				<div className="flex items-center gap-[16px] text-dark-gray font-medium mb-8 mt-4">

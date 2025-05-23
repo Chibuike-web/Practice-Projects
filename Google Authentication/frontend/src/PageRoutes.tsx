@@ -19,8 +19,6 @@ export default function PageRoutes() {
 			navigate("/", { replace: true });
 		} else if (signUp && location.pathname !== "/login") {
 			navigate("/login");
-		} else if (!authenticated && !signUp && location.pathname !== "/signup") {
-			navigate("/signup", { replace: true });
 		}
 	}, [authenticated, signUp, location.pathname, navigate]);
 

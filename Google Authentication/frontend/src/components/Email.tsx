@@ -1,11 +1,14 @@
 import { Mail } from "lucide-react";
+import clsx from "clsx";
 
 export default function Email({
 	email,
 	handleChange,
+	error,
 }: {
 	email: string;
 	handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	error: string;
 }) {
 	return (
 		<fieldset className="flex flex-col gap-[8px]">
@@ -18,7 +21,11 @@ export default function Email({
 					placeholder="Enter your email address"
 					required
 					value={email}
-					className="text-[14px] pl-[44px] border border-input-stroke py-[14px] pr-[14px] bg-very-light-gray rounded-[6px] w-full placeholder:text-[14px] placeholder:text-light-gray focus:border-primary"
+					className={clsx(
+						"text-sm pl-11 pr-4 py-3 border",
+						error ? "border-red-500" : "border-input-stroke",
+						"bg-very-light-gray rounded-md w-full placeholder:text-light-gray focus:border-primary"
+					)}
 					onChange={(e) => handleChange(e)}
 				/>
 			</div>
