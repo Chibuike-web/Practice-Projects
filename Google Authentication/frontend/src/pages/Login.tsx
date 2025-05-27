@@ -3,8 +3,7 @@ import Password from "../components/Password";
 import Button from "../components/Button";
 import { FormEvent, useState } from "react";
 import { GoogleIcon } from "../components/Icons";
-import { useAuth } from "../store/useAuth";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 interface FormErrors {
 	email: string;
@@ -17,14 +16,13 @@ interface FormData {
 }
 
 export default function Login() {
+	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [errors, setErrors] = useState<FormErrors>({
 		email: "",
 		password: "",
 	});
-	const { setAuthenticated } = useAuth();
-
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { id, value } = e.target;
 		switch (id) {
@@ -56,7 +54,7 @@ export default function Login() {
 				setEmail("");
 				setPassword("");
 				setErrors({ email: "", password: "" });
-				setAuthenticated();
+				navigate("/home");
 			}
 		} catch (error: any) {
 			console.error(`Failed to authenticate: ${error.message}`);
@@ -85,7 +83,7 @@ export default function Login() {
 				</form>
 				<div className="flex gap-[4px] justify-center mt-4">
 					<p className="text-light-gray">Don’t have an account?</p>
-					<Link to="signup">
+					<Link to="/signup">
 						<button className="text-primary font-medium">Sign up</button>
 					</Link>
 				</div>
