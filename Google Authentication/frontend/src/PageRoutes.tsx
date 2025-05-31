@@ -3,6 +3,7 @@ import NotFound from "./pages/NotFound";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import { Routes, Route, Navigate } from "react-router";
+import VerifyAccount from "./pages/VerifyAccount";
 
 export default function PageRoutes() {
 	return (
@@ -12,6 +13,7 @@ export default function PageRoutes() {
 			<Route path="/login" element={<Login />} />
 			<Route path="/home" element={<Home />} />
 			<Route path="*" element={<NotFound />} />
+			<Route path="/verify-account" element={<VerifyAccount />} />
 		</Routes>
 	);
 }

@@ -1,5 +1,5 @@
 import { Lock, EyeOff, EyeIcon } from "lucide-react";
-import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 export default function Password({
 	password,
@@ -22,7 +22,7 @@ export default function Password({
 					placeholder="Enter your password"
 					value={password}
 					required
-					className={clsx(
+					className={twMerge(
 						"text-sm pl-11 pr-4 py-3 border",
 						error !== "" ? "border-red-500" : "border-input-stroke",
 						"bg-very-light-gray rounded-md w-full placeholder:text-light-gray focus:border-primary"

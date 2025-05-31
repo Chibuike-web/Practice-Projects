@@ -1,5 +1,5 @@
 import { Mail } from "lucide-react";
-import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export default function Email({
 	email,
@@ -21,7 +21,7 @@ export default function Email({
 					placeholder="Enter your email address"
 					required
 					value={email}
-					className={clsx(
+					className={twMerge(
 						"text-sm pl-11 pr-4 py-3 border",
 						error ? "border-red-500" : "border-input-stroke",
 						"bg-very-light-gray rounded-md w-full placeholder:text-light-gray focus:border-primary"
