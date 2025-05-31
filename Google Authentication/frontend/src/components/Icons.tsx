@@ -38,9 +38,16 @@ export const VerifyIcon = () => {
 	);
 };
 
-export const WarningIcon = () => {
+export const WarningIcon = ({ className = "" }: { className?: string }) => {
 	return (
-		<svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg
+			className={className}
+			width="16"
+			height="17"
+			viewBox="0 0 16 17"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
 			<path
 				d="M9.14286 12.2988C9.14286 12.93 8.63118 13.4417 8 13.4417C7.36882 13.4417 6.85714 12.93 6.85714 12.2988C6.85714 11.6676 7.36882 11.156 8 11.156C8.63118 11.156 9.14286 11.6676 9.14286 12.2988Z"
 				fill="#ED264E"

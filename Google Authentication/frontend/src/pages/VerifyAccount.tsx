@@ -23,7 +23,7 @@ export default function VerifyAccount() {
 		if (selectedMethod === "email") {
 			return (
 				<div className="mt-4 flex items-start text-sm text-light-gray gap-2">
-					<WarningIcon />
+					<WarningIcon className="flex-shrink-0" />
 					<span>A 6-digit verification code will be sent to the email you provided.</span>
 				</div>
 			);
@@ -31,7 +31,7 @@ export default function VerifyAccount() {
 		if (selectedMethod === "phone") {
 			return (
 				<div className="mt-4 flex items-start text-sm text-light-gray gap-2">
-					<WarningIcon />
+					<WarningIcon className="flex-shrink-0" />
 					<span>
 						You’ll receive a 6-digit verification code to the phone number you provided. Text rates
 						may apply.
@@ -85,10 +85,7 @@ export default function VerifyAccount() {
 								value={phoneNumber}
 								onChange={(e) => setPhoneNumber(e.target.value)}
 								required
-								className={twMerge(
-									"text-sm px-4 py-3 border border-input-stroke",
-									"bg-very-light-gray rounded-md w-full placeholder:text-light-gray focus:border-primary"
-								)}
+								className="text-sm px-4 py-3 border border-input-stroke bg-very-light-gray rounded-md w-full placeholder:text-light-gray focus:border-primary"
 							/>
 						</fieldset>
 					)}
