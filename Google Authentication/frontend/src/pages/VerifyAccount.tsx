@@ -48,7 +48,7 @@ export default function VerifyAccount() {
 				<div className="flex flex-col items-center w-full max-w-[400px]">
 					<VerifyIcon />
 					<div className="mt-5 w-full text-center">
-						<h1 className="font-bold text-2xl tracking-tight">Let's verify your account</h1>
+						<h1 className="font-bold text-[2rem] tracking-tight">Let's verify your account</h1>
 						<p className="text-light-gray leading-snug mt-4">
 							To ensure the security of your Kulipal account, we require account verification.
 						</p>
@@ -93,11 +93,7 @@ export default function VerifyAccount() {
 					{renderInfoMessage()}
 				</div>
 
-				<Button
-					className="mt-10"
-					variant={selectedMethod ? "primary" : "disabled"}
-					disabled={!selectedMethod}
-				>
+				<Button className="mt-10" variant={selectedMethod ? "primary" : "disabled"}>
 					Next
 				</Button>
 			</div>
