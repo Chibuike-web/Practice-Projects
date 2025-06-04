@@ -1,11 +1,15 @@
 import { useState, FormEvent } from "react";
 import "./globals.css";
+import clsx from "clsx";
+
+const apiKey = import.meta.env.VITE_API_KEY;
 
 export default function App() {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [result, setResult] = useState([]);
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
+	const [cardId, setCardId] = useState("");
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -20,12 +24,12 @@ export default function App() {
 		try {
 			setLoading(true);
 			const res = await fetch(
-				`https://www.omdbapi.com/?s=${encodeURIComponent(searchTerm)}&apikey=8b76ef00`
+				`https://www.omdbapi.com/?s=${encodeURIComponent(searchTerm)}&apikey=${apiKey}`
 			);
 
 			const data = await res.json();
 
-			if (data.Response == "False") {
+			if (data.Response === "False") {
 				setError(data.Error || "No results found");
 			} else {
 				setResult(data.Search || []);
@@ -38,13 +42,13 @@ export default function App() {
 		}
 	};
 	return (
-		<div className="p-6 font-sans max-w-3xl mx-auto">
+		<div className="p-6 font-sans max-w-4xl mx-auto">
 			<form onSubmit={handleSubmit} className="flex gap-4 mb-6">
 				<input
 					type="search"
 					value={searchTerm}
 					placeholder="Search any movie"
-					className="flex-1 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+					className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
 					onChange={(e) => {
 						setSearchTerm(e.target.value);
 						setError("");
@@ -62,27 +66,84 @@ export default function App() {
 			{error && <p className="text-red-600 mb-4">{error}</p>}
 
 			{result.length > 0 && (
-				<div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6">
+				<div className="grid grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-4">
 					{result.map(({ Title, Year, imdbID, Type, Poster }) => (
-						<div key={imdbID} className="flex flex-col items-start gap-4">
-							{Poster !== "N/A" && (
-								<figure className="rounded-md w-full h-64 shadow overflow-hidden">
-									<img
-										src={Poster}
-										alt={`Poster for ${Title}`}
-										className="w-full object-cover h-full"
-									/>
-								</figure>
-							)}
-							<div>
-								<p className="text-lg font-semibold">{Title}</p>
-								<p className="text-gray-600">Type: {Type}</p>
-								<p className="text-gray-600">Year: {Year}</p>
-							</div>
-						</div>
+						<MovieCard
+							key={imdbID}
+							id={imdbID}
+							title={Title}
+							year={Year}
+							type={Type}
+							poster={Poster}
+							isCard={cardId === imdbID}
+							setCardId={setCardId}
+							handleCardClick={() => setCardId(imdbID)}
+						/>
 					))}
 				</div>
 			)}
 		</div>
 	);
 }
+
+type MovieItems = {
+	id: string;
+	title: string;
+	year: string;
+	type: string;
+	poster: string;
+};
+
+type MovieCardProps = MovieItems & {
+	isCard: boolean;
+	setCardId: (id: string) => void;
+	handleCardClick: () => void;
+};
+
+const MovieCard = ({
+	id,
+	title,
+	year,
+	type,
+	poster,
+	isCard,
+	setCardId,
+	handleCardClick,
+}: MovieCardProps) => {
+	return (
+		<>
+			<button
+				type="button"
+				key={id}
+				className={clsx(
+					"flex flex-col items-start gap-4 p-2 rounded-xl",
+					isCard ? "border  border-blue-500" : ""
+				)}
+				onClick={handleCardClick}
+			>
+				{poster !== "N/A" && (
+					<figure className="rounded-md w-full h-64 shadow overflow-hidden">
+						<img src={poster} alt={`Poster for ${title}`} className="w-full object-cover h-full" />
+					</figure>
+				)}
+				<div>
+					<p className="text-lg font-semibold">{title}</p>
+					<p className="text-gray-600">Type: {type}</p>
+					<p className="text-gray-600">Year: {year}</p>
+				</div>
+			</button>
+			{isCard && <Modal setCardId={setCardId} />}
+		</>
+	);
+};
+
+const Modal = ({ setCardId }: { setCardId: (id: string) => void }) => {
+	return (
+		<div
+			className="inset-0 bg-gray-900/25 justify-items-center content-center fixed"
+			onClick={() => setCardId("")}
+		>
+			<div className="bg-white size-2/3"></div>
+		</div>
+	);
+};
