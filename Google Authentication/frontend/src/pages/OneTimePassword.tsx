@@ -1,7 +1,7 @@
 import { ChevronLeft } from "lucide-react";
 import { Link } from "react-router";
 import { VerificationIcon } from "../components/Icons";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Button from "../components/Button";
 
 export default function OneTimePassword() {
@@ -29,6 +29,19 @@ export default function OneTimePassword() {
 
 const OtpInputs = () => {
 	const [values, setValues] = useState(Array(6).fill(""));
+	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+	useEffect(() => {
+		for (let i = 0; i < inputRefs.current.length; i++) {
+			if (inputRefs.current[i]?.value === "") {
+				inputRefs.current[i]?.focus();
+				break;
+			}
+		}
+	}, [values]);
+
+	const handlePaste = () => {};
+	const handleBackSpace = () => {};
 
 	const handleChange = (e: FormEvent<HTMLInputElement>, index: number) => {
 		const { value } = e.currentTarget;
@@ -45,6 +58,9 @@ const OtpInputs = () => {
 					<input
 						key={index}
 						type="text"
+						ref={(el) => {
+							inputRefs.current[index] = el;
+						}}
 						inputMode="numeric"
 						maxLength={1}
 						value={value}
