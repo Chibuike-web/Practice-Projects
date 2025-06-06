@@ -2,7 +2,7 @@ import { useState, FormEvent } from "react";
 import "./globals.css";
 import clsx from "clsx";
 
-const apiKey = import.meta.env.VITE_API_KEY;
+const apiKey = import.meta.env.MOVIE_API_KEY;
 
 export default function App() {
 	const [searchTerm, setSearchTerm] = useState("");
@@ -41,6 +41,10 @@ export default function App() {
 			setLoading(false);
 		}
 	};
+
+	const handleCardClick = async (id: string) => {
+		setCardId(id);
+	};
 	return (
 		<div className="p-6 font-sans max-w-4xl mx-auto">
 			<form onSubmit={handleSubmit} className="flex gap-4 mb-6">
@@ -77,7 +81,7 @@ export default function App() {
 							poster={Poster}
 							isCard={cardId === imdbID}
 							setCardId={setCardId}
-							handleCardClick={() => setCardId(imdbID)}
+							handleCardClick={() => handleCardClick(imdbID)}
 						/>
 					))}
 				</div>
