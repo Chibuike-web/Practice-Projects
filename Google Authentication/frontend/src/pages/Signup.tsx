@@ -100,8 +100,8 @@ export default function Signup() {
 		}
 	};
 	return (
-		<section className="h-screen w-screen content-center justify-items-center">
-			<div className="max-w-[500px] w-full flex flex-col px-4 md:px-0">
+		<main className="h-screen w-screen content-center justify-items-center">
+			<section className="max-w-[500px] w-full flex flex-col px-4 md:px-0">
 				<div className="flex flex-col gap-[12px] mb-[40px] w-full">
 					{registrationError && (
 						<div className="mb-4 p-4 bg-yellow-100 text-yellow-800">{registrationError}</div>
@@ -149,7 +149,7 @@ export default function Signup() {
 				<Button variant="outline" className="gap-4" onClick={() => console.log("hmm")}>
 					<GoogleIcon /> Sign up with Google
 				</Button>
-			</div>
-		</section>
+			</section>
+		</main>
 	);
 }

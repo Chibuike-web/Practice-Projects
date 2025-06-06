@@ -12,7 +12,7 @@ export default function Button({
 	...props
 }: ButtonProps) {
 	const baseStyles =
-		"flex items-center justify-center text-sm font-medium cursor-pointer w-full rounded-[6px] h-[48px]";
+		"flex items-center justify-center text-sm font-semibold cursor-pointer w-full rounded-[6px] h-[48px]";
 
 	const variantStyles = {
 		primary: "bg-primary text-white",

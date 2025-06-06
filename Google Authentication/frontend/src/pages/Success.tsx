@@ -1,0 +1,19 @@
+import { SuccessIcon } from "../components/Icons";
+import Button from "../components/Button";
+
+export default function Success() {
+	return (
+		<main className="w-full max-w-[500px] mx-auto content-center h-screen justify-items-center ">
+			<SuccessIcon />
+			<div className="flex flex-col items-center text-center">
+				<h1 className="font-bold text-[2rem] tracking-tight mt-[20px] mb-4.5">Account Verified!</h1>
+				<p className="text-light-gray leading-snug mt-4 mb-16">
+					Your account has been successfully verified. Enjoy your experience!
+				</p>
+			</div>
+			<Button variant="outline" className="border border-primary text-primary">
+				Proceed to Login
+			</Button>
+		</main>
+	);
+}
