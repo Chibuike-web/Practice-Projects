@@ -1,7 +1,7 @@
 import { ChevronLeft } from "lucide-react";
 import { Link } from "react-router";
 import { VerificationIcon } from "../components/Icons";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useRef, useState, KeyboardEvent, ClipboardEvent } from "react";
 import Button from "../components/Button";
 
 export default function OneTimePassword() {
@@ -31,17 +31,35 @@ const OtpInputs = () => {
 	const [values, setValues] = useState(Array(6).fill(""));
 	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-	useEffect(() => {
-		for (let i = 0; i < inputRefs.current.length; i++) {
-			if (inputRefs.current[i]?.value === "") {
-				inputRefs.current[i]?.focus();
-				break;
+	const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+		e.preventDefault();
+		const pastedData = e.clipboardData.getData("text").trim();
+		const arr = Array.from(pastedData);
+
+		if (arr.length > 6) {
+			alert("The code should be only 4 digits");
+			return;
+		}
+
+		if (!arr.every((char) => /^\d$/.test(char))) {
+			alert("Check the codes again. Only numbers are allowed");
+		}
+		setValues(arr);
+	};
+
+	const handleBackSpace = (e: KeyboardEvent<HTMLInputElement>, index: number) => {
+		if (e.key === "Backspace") {
+			if (inputRefs.current[index]?.value.trim() === "") {
+				e.preventDefault();
+				if (index > 0) {
+					const newValues = [...values];
+					newValues[index - 1] = "";
+					setValues(newValues);
+					inputRefs.current[index - 1]?.focus();
+				}
 			}
 		}
-	}, [values]);
-
-	const handlePaste = () => {};
-	const handleBackSpace = () => {};
+	};
 
 	const handleChange = (e: FormEvent<HTMLInputElement>, index: number) => {
 		const { value } = e.currentTarget;
@@ -50,6 +68,10 @@ const OtpInputs = () => {
 		const newValues = [...values];
 		newValues[index] = value;
 		setValues(newValues);
+
+		if (index < inputRefs.current.length - 1 && value !== "") {
+			inputRefs.current[index + 1]?.focus();
+		}
 	};
 	return (
 		<form action="" className="w-full">
@@ -66,6 +88,8 @@ const OtpInputs = () => {
 						value={value}
 						className="border border-gray-300 focus:border-gray-800 size-16 rounded-md justify-items-center content-center text-xl bg-gray-50"
 						onChange={(e) => handleChange(e, index)}
+						onKeyDown={(e) => handleBackSpace(e, index)}
+						onPaste={handlePaste}
 					/>
 				))}
 			</legend>

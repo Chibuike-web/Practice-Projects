@@ -7,7 +7,7 @@ export default function Success() {
 			<SuccessIcon />
 			<div className="flex flex-col items-center text-center">
 				<h1 className="font-bold text-[2rem] tracking-tight mt-[20px] mb-4.5">Account Verified!</h1>
-				<p className="text-light-gray leading-snug mt-4 mb-16">
+				<p className="text-light-gray leading-snug mb-16">
 					Your account has been successfully verified. Enjoy your experience!
 				</p>
 			</div>
