@@ -1,15 +1,19 @@
 import { useState, FormEvent } from "react";
 import "./globals.css";
 import clsx from "clsx";
+import { X } from "lucide-react";
+import { useLoading, useSummarizing, useSummary } from "./store/useStore";
 
-const apiKey = import.meta.env.MOVIE_API_KEY;
+const apiKey = import.meta.env.VITE_MOVIE_API_KEY;
 
 export default function App() {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [result, setResult] = useState([]);
 	const [error, setError] = useState("");
-	const [loading, setLoading] = useState(false);
+	const { isLoading, setIsLoading } = useLoading();
+	const { setIsSummarizing } = useSummarizing();
 	const [cardId, setCardId] = useState("");
+	const { setSummary } = useSummary();
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -22,7 +26,7 @@ export default function App() {
 		}
 
 		try {
-			setLoading(true);
+			setIsLoading();
 			const res = await fetch(
 				`https://www.omdbapi.com/?s=${encodeURIComponent(searchTerm)}&apikey=${apiKey}`
 			);
@@ -38,16 +42,41 @@ export default function App() {
 			console.log("Issue fetching movie lists", error);
 			setError("Failed to fetch movies. Please try again.");
 		} finally {
-			setLoading(false);
+			setIsLoading();
 		}
 	};
 
-	const handleCardClick = async (id: string) => {
+	const handleCardClick = async (id: string, title: string, year: string) => {
 		setCardId(id);
+		const prompt = `What is the plot summary for this movie: title - ${title} & year - ${year}`;
+
+		try {
+			setIsSummarizing();
+			const res = await fetch("http://localhost:5000/ai-response", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ text: prompt }), // ✅ send as object
+			});
+
+			if (!res.ok) {
+				const errorData = await res.json();
+				console.log(errorData);
+				setError(errorData);
+				return;
+			}
+
+			const data = await res.json();
+			setSummary(data.summary);
+		} catch (error) {
+			console.error("Issue fetching summary", error);
+		} finally {
+			setIsSummarizing();
+		}
 	};
+
 	return (
 		<div className="p-6 font-sans max-w-4xl mx-auto">
-			<form onSubmit={handleSubmit} className="flex gap-4 mb-6">
+			<form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 mb-6">
 				<input
 					type="search"
 					value={searchTerm}
@@ -60,10 +89,10 @@ export default function App() {
 				/>
 				<button
 					type="submit"
-					disabled={loading}
+					disabled={isLoading}
 					className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
 				>
-					{loading ? "Searching..." : "Search"}
+					{isLoading ? "Searching..." : "Search"}
 				</button>
 			</form>
 
@@ -81,7 +110,7 @@ export default function App() {
 							poster={Poster}
 							isCard={cardId === imdbID}
 							setCardId={setCardId}
-							handleCardClick={() => handleCardClick(imdbID)}
+							handleCardClick={handleCardClick}
 						/>
 					))}
 				</div>
@@ -101,7 +130,7 @@ type MovieItems = {
 type MovieCardProps = MovieItems & {
 	isCard: boolean;
 	setCardId: (id: string) => void;
-	handleCardClick: () => void;
+	handleCardClick: (id: string, title: string, year: string) => void;
 };
 
 const MovieCard = ({
@@ -123,7 +152,9 @@ const MovieCard = ({
 					"flex flex-col items-start gap-4 p-2 rounded-xl",
 					isCard ? "border  border-blue-500" : ""
 				)}
-				onClick={handleCardClick}
+				onClick={() => {
+					handleCardClick(id, title, year);
+				}}
 			>
 				{poster !== "N/A" && (
 					<figure className="rounded-md w-full h-64 shadow overflow-hidden">
@@ -142,12 +173,34 @@ const MovieCard = ({
 };
 
 const Modal = ({ setCardId }: { setCardId: (id: string) => void }) => {
+	const { summary } = useSummary();
+	const { isSummarizing } = useSummarizing();
+
 	return (
 		<div
-			className="inset-0 bg-gray-900/25 justify-items-center content-center fixed"
+			className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
 			onClick={() => setCardId("")}
 		>
-			<div className="bg-white size-2/3"></div>
+			<div
+				className="bg-white w-[90%] md:w-2/3 max-h-[80vh] p-6 rounded-2xl shadow-xl overflow-y-auto relative"
+				onClick={(e) => e.stopPropagation()}
+			>
+				<div className="flex items-center w-full justify-between mb-4">
+					<h2 className="text-2xl font-semibold text-blue-700">Plot Summary</h2>
+					<button
+						className="text-gray-500 hover:text-red-500"
+						onClick={() => setCardId("")}
+						aria-label="Close"
+					>
+						<X className="w-6 h-6" />
+					</button>
+				</div>
+				{isSummarizing ? (
+					<div>Loading...</div>
+				) : (
+					<p className="text-gray-800 leading-relaxed whitespace-pre-line">{summary}</p>
+				)}
+			</div>
 		</div>
 	);
 };
