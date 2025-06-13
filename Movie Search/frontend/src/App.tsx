@@ -3,6 +3,7 @@ import "./globals.css";
 import clsx from "clsx";
 import { X } from "lucide-react";
 import { useLoading, useSummarizing, useSummary } from "./store/useStore";
+import { motion, AnimatePresence } from "motion/react";
 
 const apiKey = import.meta.env.VITE_MOVIE_API_KEY;
 
@@ -161,7 +162,7 @@ const MovieCard = ({
 						<img src={poster} alt={`Poster for ${title}`} className="w-full object-cover h-full" />
 					</figure>
 				)}
-				<div>
+				<div className="text-left">
 					<p className="text-lg font-semibold">{title}</p>
 					<p className="text-gray-600">Type: {type}</p>
 					<p className="text-gray-600">Year: {year}</p>
@@ -177,13 +178,21 @@ const Modal = ({ setCardId }: { setCardId: (id: string) => void }) => {
 	const { isSummarizing } = useSummarizing();
 
 	return (
-		<div
+		<motion.div
 			className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
 			onClick={() => setCardId("")}
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			exit={{ opacity: 0 }}
+			transition={{ duration: 0.2 }}
 		>
-			<div
+			<motion.div
 				className="bg-white w-[90%] md:w-2/3 max-h-[80vh] p-6 rounded-2xl shadow-xl overflow-y-auto relative"
 				onClick={(e) => e.stopPropagation()}
+				initial={{ scale: 0.8, opacity: 0 }}
+				animate={{ scale: 1, opacity: 1 }}
+				exit={{ scale: 0.8, opacity: 0 }}
+				transition={{ duration: 0.3, ease: "easeOut" }}
 			>
 				<div className="flex items-center w-full justify-between mb-4">
 					<h2 className="text-2xl font-semibold text-blue-700">Plot Summary</h2>
@@ -200,7 +209,7 @@ const Modal = ({ setCardId }: { setCardId: (id: string) => void }) => {
 				) : (
 					<p className="text-gray-800 leading-relaxed whitespace-pre-line">{summary}</p>
 				)}
-			</div>
-		</div>
+			</motion.div>
+		</motion.div>
 	);
 };
