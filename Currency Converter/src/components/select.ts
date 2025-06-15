@@ -45,31 +45,30 @@ const currencyOptions: CurrencyOption[] = [
 	{ value: "ZAR", label: "ZAR - South African Rand" },
 ];
 
-const root = document.getElementById("app");
-
 const dropDownContainer = document.createElement("div");
 dropDownContainer.id = "dropdown-container";
 dropDownContainer.className =
-	"absolute bottom-[1rem] w-full bg-white h-[360px] overflow-y-auto rounded-[1rem] border border-[#e6e6e6] p-[12px]";
+	"absolute top-[4rem] w-full bg-white h-[360px] overflow-y-auto rounded-[1rem] border border-[#e6e6e6] p-[12px]";
 
 function createDropDown() {
 	currencyOptions.forEach(({ value, label }, index) => {
 		const dropDownMenu = document.createElement("div");
-		dropDownMenu.id = `menu${index + 1}`;
+		dropDownMenu.setAttribute("data-value", value);
+		dropDownMenu.id = `menu-${index + 1}`;
 		dropDownMenu.textContent = label;
-		dropDownMenu.className = "hover:bg-[#f2f2f2] p-[12px] w-full rounded-[8px]";
+		dropDownMenu.className = "menu hover:bg-[#f2f2f2] p-[12px] w-full rounded-[8px]";
 		dropDownContainer.appendChild(dropDownMenu);
 	});
 }
 
-function createSelectBtn() {
+function createSelect() {
 	const selectContainer = document.createElement("div");
 	selectContainer.className =
 		"relative w-full max-w-[500px] mt-8 justify-items-center content-center";
 	selectContainer.id = "select-container";
 
 	selectContainer.innerHTML = `
-		<button id="selectBtn" class="bg-green-500 w-full block py-4 px-4">
+		<button id="selectBtn" class="bg-green-500 w-full block py-4 px-4 rounded-xl text-left">
 			Select your current currency
 		</button>
 	`;
@@ -93,6 +92,40 @@ function createSelectBtn() {
 	return selectContainer;
 }
 
-if (root) {
-	root.appendChild(createSelectBtn());
-}
+document.body.appendChild(createSelect());
+
+const selectContainer = document.getElementById("select-container");
+document.body.addEventListener("click", (e) => {
+	if (!dropDownContainer || !selectContainer) return;
+	if (!(e.target instanceof Node) || !selectContainer.contains(e.target)) {
+		dropDownContainer.remove();
+	}
+});
+
+dropDownContainer.addEventListener("click", (e) => {
+	const target = e.target as HTMLElement;
+	if (target.classList.contains("menu")) {
+		const selectedLabel = target.textContent;
+		const selectBtn = document.querySelector("#selectBtn");
+		if (selectBtn) {
+			selectBtn.textContent = selectedLabel;
+		}
+
+		dropDownContainer.remove();
+	}
+});
+
+// const selectOption = () => {
+// 	const dropDownMenus = dropDownContainer?.querySelectorAll(".menu");
+// 	const selectBtn = document.querySelector("#selectBtn");
+// 	dropDownMenus?.forEach((menu) =>
+// 		menu.addEventListener("click", (e) => {
+// 			const target = e.currentTarget as HTMLElement;
+// 			console.log(target.textContent);
+// 			if (selectBtn && target.textContent) {
+// 				selectBtn.textContent = target.textContent;
+// 				dropDownContainer.remove();
+// 			}
+// 		})
+// 	);
+// };
