@@ -1,3 +1,5 @@
+import { chevronArrow } from "./icons";
+
 type CurrencyOption = {
 	value: string;
 	label: string;
@@ -48,9 +50,10 @@ const currencyOptions: CurrencyOption[] = [
 const dropDownContainer = document.createElement("div");
 dropDownContainer.id = "dropdown-container";
 dropDownContainer.className =
-	"absolute top-[4rem] w-full bg-white h-[360px] overflow-y-auto rounded-[1rem] border border-[#e6e6e6] p-[12px]";
+	"absolute top-[5rem] w-full bg-white h-[360px] overflow-y-auto overflow-clip rounded-[1rem] border border-[#e6e6e6] p-[12px]";
 
 function createDropDown() {
+	dropDownContainer.innerHTML = "";
 	currencyOptions.forEach(({ value, label }, index) => {
 		const dropDownMenu = document.createElement("div");
 		dropDownMenu.setAttribute("data-value", value);
@@ -68,24 +71,26 @@ function createSelect() {
 	selectContainer.id = "select-container";
 
 	selectContainer.innerHTML = `
-		<button id="selectBtn" class="bg-green-500 w-full block py-4 px-4 rounded-xl text-left">
-			Select your current currency
+		<button id="selectBtn" class="bg-white border flex justify-between items-center border-gray-300 w-full py-4 px-4 rounded-xl text-left">
+			<span id="selectLabel">Select your current currency</span>
+			<span id="chevronContainer"></span>
 		</button>
 	`;
 
 	const selectBtn = selectContainer.querySelector("#selectBtn");
-	let isDropDownInitialized = false;
 	selectBtn?.addEventListener("click", (e) => {
 		e.preventDefault();
 		const alreadyAppended = selectContainer.contains(dropDownContainer);
+		const chevron = selectContainer.querySelector("#chevronContainer svg");
 		if (alreadyAppended) {
 			dropDownContainer.remove();
+			chevron?.classList.remove("rotate-180");
+			chevron?.classList.add("rotate-0");
 		} else {
-			if (!isDropDownInitialized) {
-				createDropDown();
-				isDropDownInitialized = true;
-			}
+			createDropDown();
 			selectContainer.appendChild(dropDownContainer);
+			chevron?.classList.add("rotate-180");
+			chevron?.classList.remove("rotate-0");
 		}
 	});
 
@@ -95,10 +100,19 @@ function createSelect() {
 document.body.appendChild(createSelect());
 
 const selectContainer = document.getElementById("select-container");
+
+const chevronContainer = document.querySelector("#chevronContainer");
+if (chevronContainer) {
+	chevronContainer.innerHTML = chevronArrow();
+}
+
 document.body.addEventListener("click", (e) => {
 	if (!dropDownContainer || !selectContainer) return;
 	if (!(e.target instanceof Node) || !selectContainer.contains(e.target)) {
 		dropDownContainer.remove();
+		const chevron = selectContainer.querySelector("#chevronContainer svg");
+		chevron?.classList.remove("rotate-180");
+		chevron?.classList.add("rotate-0");
 	}
 });
 
@@ -106,26 +120,13 @@ dropDownContainer.addEventListener("click", (e) => {
 	const target = e.target as HTMLElement;
 	if (target.classList.contains("menu")) {
 		const selectedLabel = target.textContent;
-		const selectBtn = document.querySelector("#selectBtn");
-		if (selectBtn) {
-			selectBtn.textContent = selectedLabel;
+		const labelEl = document.querySelector("#selectLabel");
+		if (labelEl) {
+			labelEl.textContent = selectedLabel;
 		}
-
 		dropDownContainer.remove();
+		const chevron = selectContainer?.querySelector("#chevronContainer svg");
+		chevron?.classList.remove("rotate-180");
+		chevron?.classList.add("rotate-0");
 	}
 });
-
-// const selectOption = () => {
-// 	const dropDownMenus = dropDownContainer?.querySelectorAll(".menu");
-// 	const selectBtn = document.querySelector("#selectBtn");
-// 	dropDownMenus?.forEach((menu) =>
-// 		menu.addEventListener("click", (e) => {
-// 			const target = e.currentTarget as HTMLElement;
-// 			console.log(target.textContent);
-// 			if (selectBtn && target.textContent) {
-// 				selectBtn.textContent = target.textContent;
-// 				dropDownContainer.remove();
-// 			}
-// 		})
-// 	);
-// };
