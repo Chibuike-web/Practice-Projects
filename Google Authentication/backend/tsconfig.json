@@ -7,5 +7,5 @@
 		"esModuleInterop": true,
 		"strict": true
 	},
-	"include": ["server.ts"]
+	"include": ["src/server.ts"]
 }
