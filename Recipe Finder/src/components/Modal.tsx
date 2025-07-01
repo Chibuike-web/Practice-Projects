@@ -24,7 +24,7 @@ export const Modal = ({ cardId, setCardId }: ModalProps) => {
 			const ingredient = content[`strIngredient${i}`];
 			const measure = content[`strMeasure${i}`];
 
-			if (ingredient && ingredient.trim()) {
+			if (ingredient.trim()) {
 				ingredients.push({
 					ingredient: ingredient.trim(),
 					measure: measure ? measure.trim() : "",
