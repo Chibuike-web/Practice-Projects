@@ -1,33 +1,18 @@
 import { create } from "zustand";
-import { combine } from "zustand/middleware";
 
-// 🔹 Types for loading-related state
-type LoadingState = {
-	isLoading: boolean;
+type Store = {
 	isSummarizing: boolean;
-};
-
-type LoadingActions = {
-	setIsLoading: () => void;
 	setIsSummarizing: () => void;
 };
 
-const useLoadingStateStore = create(
-	combine<LoadingState, LoadingActions>({ isLoading: false, isSummarizing: false }, (set) => ({
-		setIsLoading: () => set((state) => ({ isLoading: !state.isLoading })),
-		setIsSummarizing: () => set((state) => ({ isSummarizing: !state.isSummarizing })),
-	}))
-);
-
-export const useLoading = () => {
-	const isLoading = useLoadingStateStore((state) => state.isLoading);
-	const setIsLoading = useLoadingStateStore((state) => state.setIsLoading);
-	return { isLoading, setIsLoading };
-};
+const useSummarizingStateStore = create<Store>((set) => ({
+	isSummarizing: false,
+	setIsSummarizing: () => set((state) => ({ isSummarizing: !state.isSummarizing })),
+}));
 
 export const useSummarizing = () => {
-	const isSummarizing = useLoadingStateStore((state) => state.isSummarizing);
-	const setIsSummarizing = useLoadingStateStore((state) => state.setIsSummarizing);
+	const isSummarizing = useSummarizingStateStore((state) => state.isSummarizing);
+	const setIsSummarizing = useSummarizingStateStore((state) => state.setIsSummarizing);
 	return { isSummarizing, setIsSummarizing };
 };
 

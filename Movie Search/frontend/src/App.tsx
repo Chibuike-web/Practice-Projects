@@ -1,17 +1,16 @@
 import { useState, FormEvent } from "react";
 import "./globals.css";
 import clsx from "clsx";
-import { X } from "lucide-react";
-import { useLoading, useSummarizing, useSummary } from "./store/useStore";
-import { motion, AnimatePresence } from "motion/react";
+import { useSummarizing, useSummary } from "./store/useStore";
+import { Modal } from "./components/Modal";
 
 const apiKey = import.meta.env.VITE_MOVIE_API_KEY;
 
 export default function App() {
-	const [searchTerm, setSearchTerm] = useState("");
+	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [result, setResult] = useState([]);
 	const [error, setError] = useState("");
-	const { isLoading, setIsLoading } = useLoading();
+	const [isLoading, setIsLoading] = useState(false);
 	const { setIsSummarizing } = useSummarizing();
 	const [cardId, setCardId] = useState("");
 	const { setSummary } = useSummary();
@@ -27,7 +26,7 @@ export default function App() {
 		}
 
 		try {
-			setIsLoading();
+			setIsLoading((prev) => !prev);
 			const res = await fetch(
 				`https://www.omdbapi.com/?s=${encodeURIComponent(searchTerm)}&apikey=${apiKey}`
 			);
@@ -43,7 +42,7 @@ export default function App() {
 			console.log("Issue fetching movie lists", error);
 			setError("Failed to fetch movies. Please try again.");
 		} finally {
-			setIsLoading();
+			setIsLoading((prev) => !prev);
 		}
 	};
 
@@ -53,23 +52,23 @@ export default function App() {
 
 		try {
 			setIsSummarizing();
-			const res = await fetch("http://localhost:5000/ai-response", {
+			const res = await fetch("http://localhost:5000/plot-summary", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text: prompt }), // ✅ send as object
+				body: JSON.stringify({ text: prompt }),
 			});
 
 			if (!res.ok) {
 				const errorData = await res.json();
-				console.log(errorData);
-				setError(errorData);
+				console.log(errorData.error);
+				setError(errorData.error);
 				return;
 			}
 
 			const data = await res.json();
-			setSummary(data.summary);
+			setSummary(data.plotSummary);
 		} catch (error) {
-			console.error("Issue fetching summary", error);
+			console.error("Issue fetching plot summary", error);
 		} finally {
 			setIsSummarizing();
 		}
@@ -150,8 +149,8 @@ const MovieCard = ({
 				type="button"
 				key={id}
 				className={clsx(
-					"flex flex-col items-start gap-4 p-2 rounded-xl",
-					isCard ? "border  border-blue-500" : ""
+					"flex flex-col items-start gap-4 p-2 rounded-xl hover:border border-blue-500",
+					isCard ? "border border-blue-500" : ""
 				)}
 				onClick={() => {
 					handleCardClick(id, title, year);
@@ -168,48 +167,7 @@ const MovieCard = ({
 					<p className="text-gray-600">Year: {year}</p>
 				</div>
 			</button>
-			{isCard && <Modal setCardId={setCardId} />}
+			{isCard && <Modal setCardId={setCardId} title={title} year={year} />}
 		</>
-	);
-};
-
-const Modal = ({ setCardId }: { setCardId: (id: string) => void }) => {
-	const { summary } = useSummary();
-	const { isSummarizing } = useSummarizing();
-
-	return (
-		<motion.div
-			className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-			onClick={() => setCardId("")}
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			exit={{ opacity: 0 }}
-			transition={{ duration: 0.2 }}
-		>
-			<motion.div
-				className="bg-white w-[90%] md:w-2/3 max-h-[80vh] p-6 rounded-2xl shadow-xl overflow-y-auto relative"
-				onClick={(e) => e.stopPropagation()}
-				initial={{ scale: 0.8, opacity: 0 }}
-				animate={{ scale: 1, opacity: 1 }}
-				exit={{ scale: 0.8, opacity: 0 }}
-				transition={{ duration: 0.3, ease: "easeOut" }}
-			>
-				<div className="flex items-center w-full justify-between mb-4">
-					<h2 className="text-2xl font-semibold text-blue-700">Plot Summary</h2>
-					<button
-						className="text-gray-500 hover:text-red-500"
-						onClick={() => setCardId("")}
-						aria-label="Close"
-					>
-						<X className="w-6 h-6" />
-					</button>
-				</div>
-				{isSummarizing ? (
-					<div>Loading...</div>
-				) : (
-					<p className="text-gray-800 leading-relaxed whitespace-pre-line">{summary}</p>
-				)}
-			</motion.div>
-		</motion.div>
 	);
 };
