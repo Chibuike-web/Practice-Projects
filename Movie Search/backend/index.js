@@ -9,10 +9,10 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = 5000;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-app.post("/ai-response", async (req, res) => {
+app.post("/plot-summary", async (req, res) => {
 	const { text } = req.body;
-	const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 	try {
 		const geminiRes = await fetch(
 			`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -22,7 +22,7 @@ app.post("/ai-response", async (req, res) => {
 				body: JSON.stringify({
 					contents: [
 						{
-							parts: [{ text: `Summarize the following:\n\n${text}` }],
+							parts: [{ text: `\n\n${text}` }],
 						},
 					],
 				}),
@@ -33,15 +33,50 @@ app.post("/ai-response", async (req, res) => {
 			console.error(`Gemini API Error (${geminiRes.status}): ${errorText}`);
 			return res
 				.status(res.status)
-				.json({ error: "Failed to get summary from Gemini API", details: errorText });
+				.json({ error: "Failed to generate plot summary from Gemini API", details: errorText });
 		}
 
 		const data = await geminiRes.json();
-		const summary = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No summary found";
-		res.json({ summary });
+		const plotSummary = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No plot summary found";
+		res.json({ plotSummary });
 	} catch (error) {
-		console.error("Summarization error:", error);
-		res.status(500).json({ error: "Failed to summarize text" });
+		console.error("Plot summarization error:", error);
+		res.status(500).json({ error: "Failed to summarize plot" });
+	}
+});
+
+app.post("/actors", async (req, res) => {
+	const { text } = req.body;
+	try {
+		const geminiRes = await fetch(
+			`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+			{
+				method: "POST",
+				headers: { "Content-Type": "applocation/json" },
+				body: JSON.stringify({
+					contents: [
+						{
+							parts: [{ text: `\n\n${text}` }],
+						},
+					],
+				}),
+			}
+		);
+		if (!geminiRes.ok) {
+			const errorText = await geminiRes.text();
+			console.error(`Gemini API Error (${geminiRes.status}): ${errorText}`);
+			return res
+				.status(res.status)
+				.json({ error: "Failed to generate list of actors from Gemini API", details: errorText });
+		}
+		const data = await geminiRes.json();
+		const listOfActors =
+			data?.candidates?.[0]?.content?.parts?.[0]?.text || "No list of actors found";
+
+		res.json(listOfActors);
+	} catch (err) {
+		console.error("Fetching error", err);
+		res.status(500).json({ error: "Failed to fetch actors" });
 	}
 });
 

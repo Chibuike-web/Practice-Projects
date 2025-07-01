@@ -50,7 +50,6 @@ export const Modal = ({ setCardId, title, year }: ModalProps) => {
 					};
 				});
 			setLists(actorsLists);
-			console.log(actorsLists);
 		} catch (err) {
 			console.error("Issue fetching list of actors", err);
 			setError("Something went wrong while fetching the cast list.");
@@ -69,15 +68,15 @@ export const Modal = ({ setCardId, title, year }: ModalProps) => {
 			transition={{ duration: 0.2 }}
 		>
 			<motion.div
-				className="bg-white w-[90%] md:w-2/3 max-h-[80vh] p-6 rounded-2xl shadow-xl overflow-y-auto relative"
+				className="modal-scroll-container  bg-white w-[90%] md:w-2/3 max-h-[80vh] rounded-2xl shadow-xl overflow-y-auto"
 				onClick={(e) => e.stopPropagation()}
 				initial={{ scale: 0.8, opacity: 0 }}
 				animate={{ scale: 1, opacity: 1 }}
 				exit={{ scale: 0.8, opacity: 0 }}
 				transition={{ duration: 0.3, ease: "easeOut" }}
 			>
-				<div className="flex items-center w-full justify-between mb-4">
-					<h2 className="text-2xl font-semibold text-blue-700">Plot Summary</h2>
+				<div className="flex items-center w-full justify-between mb-4 pl-6 pr-4 py-6 border-b border-gray-200 sticky top-0 bg-white">
+					<h2 className="text-2xl font-bold text-blue-700">Plot Summary</h2>
 					<button
 						className="text-gray-500 hover:text-red-500"
 						onClick={() => setCardId("")}
@@ -86,46 +85,48 @@ export const Modal = ({ setCardId, title, year }: ModalProps) => {
 						<X className="w-6 h-6" />
 					</button>
 				</div>
-				{isSummarizing ? (
-					<div>Loading...</div>
-				) : (
-					<p className="text-gray-800 leading-relaxed whitespace-pre-line">{summary}</p>
-				)}
+				<div className=" pl-6 pr-4">
+					{isSummarizing ? (
+						<div>Loading...</div>
+					) : (
+						<p className="text-gray-800 leading-relaxed whitespace-pre-line">{summary}</p>
+					)}
+				</div>
 
-				{!isSummarizing && (
-					<button
-						type="submit"
-						disabled={isLoading}
-						className="px-5 py-2 mt-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-						onClick={handleSearch}
-					>
-						{isLoading ? "Searching..." : lists.length > 0 ? "Refetch Actors" : "Search Actors"}
-					</button>
-				)}
-				{error && (
-					<p className="mt-4 text-red-600 font-medium bg-red-100 p-3 rounded">⚠️ {error}</p>
-				)}
-
-				{error && lists.length === 0 && !isLoading && (
-					<p className="mt-4 text-gray-500 italic">No actors found for this movie.</p>
-				)}
-
-				{lists.length > 0 && (
-					<div className="mt-6 space-y-3">
-						<h3 className="text-xl font-semibold text-gray-800 mb-2">Cast List</h3>
-						<div className="divide-y divide-gray-200 border border-gray-500 rounded-lg overflow-hidden">
-							{lists.map(({ id, name, role }) => (
-								<div
-									key={id}
-									className="flex justify-between items-start p-3 bg-white hover:bg-gray-50"
-								>
-									<span className="font-medium text-gray-900">{name}</span>
-									<span className="text-sm text-gray-600 text-right">{role}</span>
-								</div>
-							))}
+				<div className=" pl-6 pr-4 pb-6">
+					{!isSummarizing && (
+						<button
+							type="submit"
+							disabled={isLoading}
+							className="px-5 py-2 mt-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+							onClick={handleSearch}
+						>
+							{isLoading ? "Searching..." : lists.length > 0 ? "Refetch Actors" : "Search Actors"}
+						</button>
+					)}
+					{error && (
+						<p className="mt-4 text-red-600 font-medium bg-red-100 p-3 rounded">⚠️ {error}</p>
+					)}
+					{error && lists.length === 0 && !isLoading && (
+						<p className="mt-4 text-gray-500 italic">No actors found for this movie.</p>
+					)}
+					{lists.length > 0 && (
+						<div className="mt-6 space-y-3">
+							<h3 className="text-xl font-semibold text-gray-800 mb-2">Cast List</h3>
+							<div className="divide-y divide-gray-200 border border-gray-500 rounded-lg overflow-hidden">
+								{lists.map(({ id, name, role }) => (
+									<div
+										key={id}
+										className="flex justify-between items-start p-3 bg-white hover:bg-gray-50"
+									>
+										<span className="font-medium text-gray-900">{name}</span>
+										<span className="text-sm text-gray-600 text-right">{role}</span>
+									</div>
+								))}
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+				</div>
 			</motion.div>
 		</motion.div>
 	);
