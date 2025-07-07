@@ -34,11 +34,12 @@ export default function App() {
 			setError("Failed to fetch news. Please try again");
 		} finally {
 			setLoading(false);
+			setSearchTerm("");
 		}
 	};
 	return (
-		<div className="p-6 font-sans max-w-6xl mx-auto">
-			<form onSubmit={handleSubmit} className="flex max-w-3xl gap-4 mb-6">
+		<div className="p-6 font-sans max-w-6xl mx-auto flex flex-col items-center justify-center gap-12">
+			<form onSubmit={handleSubmit} className="flex flex-col sm:flex-row w-full max-w-3xl gap-4">
 				<input
 					type="search"
 					value={searchTerm}
@@ -60,7 +61,7 @@ export default function App() {
 			{error && <p className="text-red-600 mb-4">{error}</p>}
 
 			{result.length > 0 && (
-				<div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
+				<div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6">
 					{result.map(({ title, description, url, image, source, publishedAt }, index) => (
 						<NewsCard
 							key={index}
