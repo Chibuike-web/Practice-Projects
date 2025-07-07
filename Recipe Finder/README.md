@@ -2,6 +2,8 @@
 
 **Recipe Finder** is a web application that allows users to browse food categories and discover meals using data from [TheMealDB API](https://www.themealdb.com/). The app focuses on exploring modern data-fetching strategies with **TanStack Query**, while keeping the UI clean and responsive.
 
+![App Demo](./public/RecipeFinder.gif)
+
 ## ✨ Features
 
 - Browse all available meal categories
@@ -41,5 +43,3 @@ Endpoints used:
 - `GET /categories.php` – Fetch all food categories
 - `GET /filter.php?c=CategoryName` – Fetch meals in a category
 - `GET /lookup.php?i=MealId` – (optional) Fetch full recipe details
-
-[App Demo](./public/RecipeFinder.gif)
