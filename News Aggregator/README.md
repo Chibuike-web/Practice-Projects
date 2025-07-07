@@ -2,7 +2,7 @@
 
 **News Search** is a lightweight web application that lets users search for the latest news articles using the [GNews API](https://gnews.io/docs/). It emphasizes simplicity, clean UI, and real-time search powered by live API data.
 
-![App Demo](/public/demo.gif)
+![App Demo](demo.gif)
 
 ## ✨ Features
 
