@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { motion } from "motion/react";
-import { fetchRecipe } from "../api";
+import { fetchRecipe } from "../services/api";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react/jsx-runtime";
 
@@ -27,7 +27,7 @@ export const Modal = ({ cardId, setCardId }: ModalProps) => {
 			if (ingredient.trim()) {
 				ingredients.push({
 					ingredient: ingredient.trim(),
-					measure: measure ? measure.trim() : "",
+					measure: measure?.trim() || "",
 				});
 			}
 		}

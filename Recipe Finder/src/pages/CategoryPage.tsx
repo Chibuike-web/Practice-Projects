@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import CategoryCard from "../components/CategoryCard";
 import type { CategoryType } from "../types";
-import { fetchCategories } from "../api";
+import { fetchCategories } from "../services/api";
 
 export default function CategoryPage() {
 	const { data, isLoading, isError, error } = useQuery({

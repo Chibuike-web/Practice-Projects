@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 import MealCard from "../components/MealCard";
 import { MealType } from "../types";
-import { fetchMealsByCategory } from "../api";
+import { fetchMealsByCategory } from "../services/api";
 
 export default function MealPage() {
 	const [searchParams] = useSearchParams();
