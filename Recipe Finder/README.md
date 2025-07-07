@@ -2,7 +2,7 @@
 
 **Recipe Finder** is a web application that allows users to browse food categories and discover meals using data from [TheMealDB API](https://www.themealdb.com/). The app focuses on exploring modern data-fetching strategies with **TanStack Query**, while keeping the UI clean and responsive.
 
-![App Demo](./public/RecipeFinder.gif)
+![App Demo](./RecipeFinder.gif)
 
 ## ✨ Features
 
