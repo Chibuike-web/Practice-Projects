@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import { generateOTP } from "./utils";
+import { sendEmailOTP } from "./emailOTP";
+import { sendPhoneOTP } from "./phoneOTP";
 
 dotenv.config();
 const app = express();
@@ -40,7 +42,7 @@ app.post("/auth/register", async (req: any, res: any) => {
 		const existingUser = users.find((user) => user.email === email);
 		if (existingUser) {
 			console.log("User exists");
-			return res.status(400).json({ message: "User already exists" });
+			return res.status(400).json({ message: "user already exists" });
 		}
 
 		const saltRounds = 10;
@@ -70,11 +72,29 @@ app.post("/auth/request-verification", async (req: any, res: any) => {
 	if (!user) return res.status(404).json({ message: "User not found" });
 
 	if (method === "email") {
-		const otp = generateOTP();
-		user.emailOTP = otp;
-		console.log(`Email OTP for ${email}: ${otp}`);
-		res.status(200).json({ message: "Email OTP sent" });
+		try {
+			const otp = generateOTP();
+			user.emailOTP = otp;
+			console.log(`Email OTP for ${email}: ${otp}`);
+
+			await sendEmailOTP(email, otp);
+			res.status(200).json({ message: "OTP sent" });
+		} catch (error) {
+			console.error("Error sending email OTP:", error);
+			res.status(500).json({ message: "Failed to send OTP" });
+		}
 	} else if (method === "phone") {
+		try {
+			const otp = generateOTP();
+			user.phoneOTP = otp;
+			console.log(`Phone OTP for ${phone}: ${otp}`);
+
+			await sendPhoneOTP(phone, otp);
+			res.status(200).json({ message: "OTP sent" });
+		} catch (error) {
+			console.error("Error sending email OTP:", error);
+			res.status(500).json({ message: "Failed to send OTP" });
+		}
 	}
 });
 

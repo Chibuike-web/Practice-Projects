@@ -3,10 +3,16 @@ import Button from "../components/Button";
 import { VerifyIcon, WarningIcon } from "../components/Icons";
 import { twMerge } from "tailwind-merge";
 import { Check } from "lucide-react";
+import { useUser } from "../store/userStore";
+import { useLoading } from "../Hooks";
+import { useNavigate } from "react-router";
 
 export default function VerifyAccount() {
 	const [selectedMethod, setSelectedMethod] = useState<"email" | "phone" | null>(null);
 	const [phoneNumber, setPhoneNumber] = useState<string>("");
+	const navigate = useNavigate();
+	const { isLoading, setIsLoading } = useLoading();
+	const { userEmail } = useUser();
 
 	const handleSelect = (e: FormEvent, method: "email" | "phone") => {
 		e.preventDefault();
@@ -41,6 +47,41 @@ export default function VerifyAccount() {
 		}
 		return null;
 	};
+
+	async function handleRequestOTP() {
+		if (!selectedMethod) return;
+		const payload: any = {
+			email: userEmail,
+			method: selectedMethod,
+		};
+
+		if (selectedMethod === "phone") {
+			payload.phone = phoneNumber;
+		}
+
+		setIsLoading(true);
+		try {
+			const res = await fetch("http://localhost:1234/auth/request-verification", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			});
+
+			if (!res.ok) {
+				const errorData = await res.json();
+				console.log(errorData.message);
+				return;
+			}
+
+			const data = await res.json();
+			console.log(data.message);
+			navigate("/otp");
+		} catch (error) {
+			console.log("Issue fetching OTP", error);
+		} finally {
+			setIsLoading(false);
+		}
+	}
 
 	return (
 		<main className="grid place-items-center h-screen px-4">
@@ -93,8 +134,12 @@ export default function VerifyAccount() {
 					{renderInfoMessage()}
 				</div>
 
-				<Button className="mt-10" variant={selectedMethod ? "primary" : "disabled"}>
-					Next
+				<Button
+					className="mt-10"
+					variant={!isLoading && selectedMethod ? "primary" : "disabled"}
+					onClick={handleRequestOTP}
+				>
+					{isLoading ? "Verifying" : "Verify"}
 				</Button>
 			</div>
 		</main>

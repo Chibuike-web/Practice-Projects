@@ -7,6 +7,8 @@ import Button from "../components/Button";
 import { GoogleIcon } from "../components/Icons";
 import { validateName, validateEmail, validatePassword, validateCheked } from "../validations";
 import { Link, useNavigate } from "react-router";
+import { useUser } from "../store/userStore";
+import { useLoading } from "../Hooks";
 
 export default function Signup() {
 	const [name, setName] = useState("");
@@ -18,8 +20,10 @@ export default function Signup() {
 	const [passwordError, setPasswordError] = useState("");
 	const [checkedError, setCheckedError] = useState("");
 	const [registrationError, setRegistrationError] = useState("");
+	const { isLoading, setIsLoading } = useLoading();
 
 	const navigate = useNavigate();
+	const { setUser } = useUser();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { id, value, checked: isChecked } = e.target;
@@ -59,22 +63,8 @@ export default function Signup() {
 		if (nameErr || emailErr || passwordErr || checkedErr) return;
 
 		const formData = { name, email, password, checked };
-		const success = await auth(formData);
 
-		if (success) {
-			setName("");
-			setEmail("");
-			setPassword("");
-			setChecked(false);
-			navigate("/login");
-		}
-	};
-	const auth = async (formData: {
-		name: string;
-		email: string;
-		password: string;
-		checked: boolean;
-	}) => {
+		setIsLoading(true);
 		try {
 			const res = await fetch("http://localhost:1234/auth/register", {
 				method: "POST",
@@ -86,19 +76,35 @@ export default function Signup() {
 				const errorData = await res.json();
 				if (errorData.message) {
 					setRegistrationError(errorData.message);
-					throw new Error(errorData.message || "Registration failed");
+					if (errorData.message.toLowerCase() === "user already exists") {
+						setName("");
+						setEmail("");
+						setPassword("");
+						setChecked(false);
+						navigate("/login");
+					}
+
+					return;
 				}
-				return false;
+				throw new Error(errorData.message || "Registration failed");
 			}
 			const data = await res.json();
 			console.log("Registration successful:", data.message);
+			setUser({ userEmail: formData.email, isVerified: false });
+
 			setRegistrationError("");
-			return true;
-		} catch (error: any) {
-			console.error(`Failed to register: ${error.message}`);
-			return false;
+			setName("");
+			setEmail("");
+			setPassword("");
+			setChecked(false);
+			navigate("/verify-account");
+		} catch (error) {
+			console.error(`Failed to register: ${error}`);
+		} finally {
+			setIsLoading(false);
 		}
 	};
+
 	return (
 		<main className="h-screen w-screen content-center justify-items-center">
 			<section className="max-w-[500px] w-full flex flex-col px-4 md:px-0">
@@ -130,14 +136,14 @@ export default function Signup() {
 						{checkedError && <p className="text-red-500 mt-[4px]">{checkedError}</p>}
 					</div>
 					<Button variant="primary" type="submit" className="mt-10">
-						Sign up
+						{isLoading ? "Signing up..." : "Sign up"}
 					</Button>
 				</form>
 
 				<div className="flex gap-[4px] justify-center mt-4">
 					<p className="text-light-gray">Have an account already?</p>
 					<Link to="/login">
-						<button className="text-primary font-medium">Log in</button>
+						<Button className="text-[1rem] font-medium">Log in</Button>
 					</Link>
 				</div>
 
