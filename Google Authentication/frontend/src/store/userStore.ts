@@ -1,25 +1,38 @@
 import { create } from "zustand";
 
-interface UserType {
-	userEmail: string;
+interface User {
+	id: string;
+	name: string;
+	email: string;
+	password: string;
+	checked: boolean;
 	isVerified: boolean;
-	setUser: (user: { userEmail: string; isVerified: boolean }) => void;
+}
+interface UserType {
+	users: User[];
+	setUsers: (users: User[]) => void;
+	addUser: (user: User) => void;
+	updateUser: (id: string, isVerified: boolean) => void;
 }
 
 const useUserStore = create<UserType>((set) => ({
-	userEmail: "",
-	isVerified: false,
-	setUser: (user) => set({ ...user }),
+	users: [],
+	setUsers: (newUsers: User[]) => set({ users: newUsers }),
+	addUser: (newUser: User) => set((state) => ({ users: [...state.users, newUser] })),
+	updateUser: (id: string, isVerified: boolean) =>
+		set((state) => ({ users: state.users.map((u) => (u.id === id ? { ...u, isVerified } : u)) })),
 }));
 
 export const useUser = () => {
-	const userEmail = useUserStore((state) => state.userEmail);
-	const isVerified = useUserStore((state) => state.isVerified);
-	const setUser = useUserStore((state) => state.setUser);
+	const users = useUserStore((state) => state.users);
+	const setUsers = useUserStore((state) => state.setUsers);
+	const addUser = useUserStore((state) => state.addUser);
+	const updateUser = useUserStore((state) => state.updateUser);
 
 	return {
-		userEmail,
-		isVerified,
-		setUser,
+		users,
+		setUsers,
+		addUser,
+		updateUser,
 	};
 };

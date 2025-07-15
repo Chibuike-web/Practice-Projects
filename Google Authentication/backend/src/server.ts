@@ -25,12 +25,10 @@ interface User {
 	id: string;
 	name: string;
 	email: string;
-	phone?: string;
 	password: string;
-	isEmailVerified: boolean;
-	isPhoneVerified: boolean;
-	emailOTP?: string;
-	phoneOTP?: string;
+	checked: boolean;
+	isVerified: boolean;
+	otp?: string;
 }
 const users: User[] = [];
 
@@ -42,7 +40,7 @@ app.post("/auth/register", async (req: any, res: any) => {
 		const existingUser = users.find((user) => user.email === email);
 		if (existingUser) {
 			console.log("User exists");
-			return res.status(400).json({ message: "user already exists" });
+			return res.status(400).json({ message: "user already exists", user: existingUser });
 		}
 
 		const saltRounds = 10;
@@ -52,14 +50,14 @@ app.post("/auth/register", async (req: any, res: any) => {
 			id: uuidv4(),
 			name,
 			email,
+			checked,
 			password: hashedPassword,
-			isEmailVerified: false,
-			isPhoneVerified: false,
+			isVerified: false,
 		};
 
 		users.push(newUser);
 		console.log(users);
-		return res.status(200).json({ message: "User Registered" });
+		return res.status(200).json({ message: "User Registered", user: newUser });
 	} catch (error) {
 		console.error("Registration error:", error);
 		return res.status(500).json({ message: "Something went wrong" });
@@ -67,18 +65,19 @@ app.post("/auth/register", async (req: any, res: any) => {
 });
 
 app.post("/auth/request-verification", async (req: any, res: any) => {
-	const { email, method, phone } = req.body;
+	const { id, email, method, phone } = req.body;
 	const user = users.find((u) => u.email === email);
 	if (!user) return res.status(404).json({ message: "User not found" });
 
 	if (method === "email") {
 		try {
 			const otp = generateOTP();
-			user.emailOTP = otp;
+			user.otp = otp;
 			console.log(`Email OTP for ${email}: ${otp}`);
-
 			await sendEmailOTP(email, otp);
-			res.status(200).json({ message: "OTP sent" });
+
+			const value = { id, email };
+			res.status(200).json({ message: "OTP sent", value });
 		} catch (error) {
 			console.error("Error sending email OTP:", error);
 			res.status(500).json({ message: "Failed to send OTP" });
@@ -86,7 +85,7 @@ app.post("/auth/request-verification", async (req: any, res: any) => {
 	} else if (method === "phone") {
 		try {
 			const otp = generateOTP();
-			user.phoneOTP = otp;
+			user.otp = otp;
 			console.log(`Phone OTP for ${phone}: ${otp}`);
 
 			await sendPhoneOTP(phone, otp);
@@ -95,6 +94,26 @@ app.post("/auth/request-verification", async (req: any, res: any) => {
 			console.error("Error sending email OTP:", error);
 			res.status(500).json({ message: "Failed to send OTP" });
 		}
+	}
+});
+
+app.post("/auth/otp", async (req: any, res: any) => {
+	const { id, otp } = req.body;
+	console.log(otp);
+	try {
+		const user = users.find((u) => u.id === id);
+		const isOtpExist = user?.otp;
+		console.log(isOtpExist);
+		if (isOtpExist && isOtpExist !== otp) {
+			res.status(400).json({ message: "The OTP you entered is incorrect. Please try again." });
+		}
+		if (user) {
+			user.isVerified = true;
+		}
+		res.status(200).json({ message: "user verified", id: id, isVerified: user?.isVerified });
+	} catch (error) {
+		console.error("Error verifying user:", error);
+		res.status(500).json({ message: "Failed to verify" });
 	}
 });
 

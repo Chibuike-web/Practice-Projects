@@ -1,13 +1,20 @@
 import { ChevronLeft } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { VerificationIcon } from "../components/Icons";
 import { FormEvent, useRef, useState, KeyboardEvent, ClipboardEvent } from "react";
 import Button from "../components/Button";
+import { useParams } from "react-router";
+import { useLoading } from "../Hooks";
+import { useUser } from "../store/userStore";
 
 export default function OneTimePassword() {
+	const { id } = useParams<{ id: string }>();
+	if (!id) {
+		throw new Error("Missing ID in URL");
+	}
 	return (
 		<main className="w-full max-w-[500px] mx-auto mt-[88px]">
-			<Link to="/verify-account" className="flex items-center text-primary">
+			<Link to={`/verify-account/${id}`} className="flex items-center text-primary">
 				<ChevronLeft />
 				Back
 			</Link>
@@ -20,16 +27,21 @@ export default function OneTimePassword() {
 							To ensure the security of your Kulipal account, we require account verification.
 						</p>
 					</div>
-					<OtpInputs />
+					<OtpInputs id={id} />
 				</div>
 			</section>
 		</main>
 	);
 }
 
-const OtpInputs = () => {
+const OtpInputs = ({ id }: { id: string }) => {
 	const [values, setValues] = useState(Array(6).fill(""));
 	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+	const { isLoading, setIsLoading } = useLoading();
+	const navigate = useNavigate();
+	const [error, setError] = useState("");
+	const [success, setSuccess] = useState("");
+	const { updateUser } = useUser();
 
 	const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
 		e.preventDefault();
@@ -37,12 +49,12 @@ const OtpInputs = () => {
 		const arr = Array.from(pastedData);
 
 		if (arr.length > 6) {
-			alert("The code should be only 4 digits");
+			setError("The code should be only 6 digits");
 			return;
 		}
 
 		if (!arr.every((char) => /^\d$/.test(char))) {
-			alert("Check the codes again. Only numbers are allowed");
+			setError("Check the codes again. Only numbers are allowed");
 		}
 		setValues(arr);
 	};
@@ -73,8 +85,39 @@ const OtpInputs = () => {
 			inputRefs.current[index + 1]?.focus();
 		}
 	};
+
+	const handleSubmit = async (e: FormEvent) => {
+		e.preventDefault();
+		setError("");
+		const otp = values.join("");
+		console.log(otp);
+		setIsLoading(true);
+		try {
+			const res = await fetch("http://localhost:1234/auth/otp", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ id: id, otp: otp }),
+			});
+			if (!res.ok) {
+				const errorData = await res.json();
+				console.log(errorData.message);
+				setError(errorData.message);
+				return;
+			}
+			const data = await res.json();
+			console.log(data.message);
+			setSuccess(data.message);
+			updateUser(data.id, data.isVerified);
+			setTimeout(() => navigate("/success"), 1000);
+			setValues([]);
+		} catch (err) {
+			console.log("Issue verifying OTP", err);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 	return (
-		<form action="" className="w-full">
+		<form onSubmit={handleSubmit} className="w-full">
 			<legend className="flex gap-4 justify-between mt-16 mb-12">
 				{values.map((value, index) => (
 					<input
@@ -93,9 +136,21 @@ const OtpInputs = () => {
 					/>
 				))}
 			</legend>
+
 			<Button variant={values.every((value) => value !== "") ? "primary" : "disabled"}>
-				Verify
+				{isLoading ? "Verifying..." : "Verify"}
 			</Button>
+			{error && (
+				<p className="mt-4 rounded-md bg-red-100 text-center text-red-700 px-4 py-3 border border-red-300">
+					{error}
+				</p>
+			)}
+			{success && (
+				<p className="mt-4 rounded-md bg-green-100 text-center text-green-700 px-4 py-3 border border-green-300">
+					{success}
+				</p>
+			)}
+
 			<p className="mt-4 text-center text-gray-500">
 				Didn’t receive a code? <span className="text-primary font-medium">Resend code</span>
 			</p>

@@ -1,11 +1,34 @@
+import { Link } from "react-router";
 import { cn } from "../utils";
+import { ReactNode } from "react";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-	variant?: "text" | "primary" | "outline" | "disabled";
+type ButtonVariants = "text" | "primary" | "outline" | "disabled";
+
+type BaseProps = {
+	variant?: ButtonVariants;
 	className?: string;
-}
+};
 
-export default function Button({ variant = "text", className, ...props }: ButtonProps) {
+type LinkProps = BaseProps & {
+	as: "link";
+	to: string;
+	children: ReactNode;
+};
+
+type NativeButtonProps = BaseProps &
+	React.ButtonHTMLAttributes<HTMLButtonElement> & {
+		as?: "button";
+	};
+
+type ButtonProps = LinkProps | NativeButtonProps;
+
+export default function Button({
+	variant = "text",
+	as = "button",
+	className,
+
+	...props
+}: ButtonProps) {
 	const baseStyles = "flex items-center justify-center text-sm font-semibold cursor-pointer w-full";
 
 	const variantStyles = {
@@ -16,6 +39,11 @@ export default function Button({ variant = "text", className, ...props }: Button
 	};
 
 	const buttonClass = cn(baseStyles, variantStyles[variant], className);
+
+	const { to, ...linkProps } = props as LinkProps;
+	if (as === "link") {
+		return <Link to={to} className={buttonClass} {...linkProps} />;
+	}
 
 	return <button className={buttonClass} {...props} />;
 }

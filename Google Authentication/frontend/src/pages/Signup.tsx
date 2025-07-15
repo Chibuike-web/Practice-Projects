@@ -23,7 +23,7 @@ export default function Signup() {
 	const { isLoading, setIsLoading } = useLoading();
 
 	const navigate = useNavigate();
-	const { setUser } = useUser();
+	const { addUser } = useUser();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { id, value, checked: isChecked } = e.target;
@@ -73,31 +73,35 @@ export default function Signup() {
 			});
 
 			if (!res.ok) {
-				const errorData = await res.json();
-				if (errorData.message) {
-					setRegistrationError(errorData.message);
-					if (errorData.message.toLowerCase() === "user already exists") {
+				const data = await res.json();
+				if (data.message) {
+					setRegistrationError(data.message);
+					if (data.message.toLowerCase() === "user already exists") {
 						setName("");
 						setEmail("");
 						setPassword("");
 						setChecked(false);
-						navigate("/login");
+						if (!data.user.isVerified) {
+							navigate(`/verify-account/${data.user.id}`);
+						} else {
+							navigate("login");
+						}
 					}
 
 					return;
 				}
-				throw new Error(errorData.message || "Registration failed");
+				throw new Error(data.message || "Registration failed");
 			}
 			const data = await res.json();
 			console.log("Registration successful:", data.message);
-			setUser({ userEmail: formData.email, isVerified: false });
+			addUser(data.user);
 
 			setRegistrationError("");
 			setName("");
 			setEmail("");
 			setPassword("");
 			setChecked(false);
-			navigate("/verify-account");
+			navigate(`/verify-account/${data.user.id}`);
 		} catch (error) {
 			console.error(`Failed to register: ${error}`);
 		} finally {
@@ -147,7 +151,7 @@ export default function Signup() {
 					</Link>
 				</div>
 
-				<div className="flex items-center gap-[16px] text-dark-gray font-medium mb-8 mt-4">
+				<div className="flex items-center gap-[16px] text-dark-gray font-medium my-8">
 					<span className="w-full bg-dark-gray/25 h-[0.5px] block " />
 					OR
 					<span className="w-full bg-dark-gray/25 h-[0.5px] block " />

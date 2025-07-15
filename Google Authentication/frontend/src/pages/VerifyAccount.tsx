@@ -5,14 +5,17 @@ import { twMerge } from "tailwind-merge";
 import { Check } from "lucide-react";
 import { useUser } from "../store/userStore";
 import { useLoading } from "../Hooks";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 export default function VerifyAccount() {
 	const [selectedMethod, setSelectedMethod] = useState<"email" | "phone" | null>(null);
 	const [phoneNumber, setPhoneNumber] = useState<string>("");
+	const { id } = useParams();
 	const navigate = useNavigate();
 	const { isLoading, setIsLoading } = useLoading();
-	const { userEmail } = useUser();
+	const { users } = useUser();
+
+	const userEmail = users.find((u) => u.id === id)?.email;
 
 	const handleSelect = (e: FormEvent, method: "email" | "phone") => {
 		e.preventDefault();
@@ -51,6 +54,7 @@ export default function VerifyAccount() {
 	async function handleRequestOTP() {
 		if (!selectedMethod) return;
 		const payload: any = {
+			id: id,
 			email: userEmail,
 			method: selectedMethod,
 		};
@@ -75,7 +79,7 @@ export default function VerifyAccount() {
 
 			const data = await res.json();
 			console.log(data.message);
-			navigate("/otp");
+			navigate(`/otp/${data.value.id}`);
 		} catch (error) {
 			console.log("Issue fetching OTP", error);
 		} finally {

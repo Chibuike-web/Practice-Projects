@@ -11,7 +11,12 @@ export default function Success() {
 					Your account has been successfully verified. Enjoy your experience!
 				</p>
 			</div>
-			<Button variant="outline" className="border border-primary text-primary">
+			<Button
+				as="link"
+				to="/login"
+				variant="outline"
+				className="border border-primary text-primary"
+			>
 				Proceed to Login
 			</Button>
 		</main>
