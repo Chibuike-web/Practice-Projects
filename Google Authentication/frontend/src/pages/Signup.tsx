@@ -82,7 +82,7 @@ export default function Signup() {
 						if (!data.user.isVerified) {
 							navigate(`/verify-account/${data.user.id}`);
 						} else {
-							navigate("login");
+							navigate("/login");
 						}
 					}
 

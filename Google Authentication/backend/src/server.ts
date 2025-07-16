@@ -32,6 +32,18 @@ interface User {
 }
 const users: User[] = [];
 
+//Sending users
+
+app.get("/auth/users/:id", async (req: any, res: any) => {
+	const { id } = req.params;
+	const user = users.find((u) => u.id === id);
+	if (!user) {
+		console.log("User does not exist");
+		return res.status(400).json({ message: "user does not exist" });
+	}
+	return res.status(200).json({ user });
+});
+
 // Register
 app.post("/auth/register", async (req: any, res: any) => {
 	try {
