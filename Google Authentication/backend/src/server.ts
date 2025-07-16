@@ -39,7 +39,7 @@ app.post("/auth/register", async (req: any, res: any) => {
 
 		const existingUser = users.find((user) => user.email === email);
 		if (existingUser) {
-			console.log("User exists");
+			console.log("User exists:", existingUser.email);
 			return res.status(400).json({ message: "user already exists", user: existingUser });
 		}
 
@@ -65,19 +65,17 @@ app.post("/auth/register", async (req: any, res: any) => {
 });
 
 app.post("/auth/request-verification", async (req: any, res: any) => {
-	const { id, email, method, phone } = req.body;
-	const user = users.find((u) => u.email === email);
+	const { id, method, phone } = req.body;
+	const user = users.find((u) => u.id === id);
 	if (!user) return res.status(404).json({ message: "User not found" });
-
+	const email = user.email;
 	if (method === "email") {
 		try {
 			const otp = generateOTP();
 			user.otp = otp;
-			console.log(`Email OTP for ${email}: ${otp}`);
+			console.log(`Email OTP for ${email}: ${otp} : ${id}`);
 			await sendEmailOTP(email, otp);
-
-			const value = { id, email };
-			res.status(200).json({ message: "OTP sent", value });
+			res.status(200).json({ message: "OTP sent", id: id, email: email });
 		} catch (error) {
 			console.error("Error sending email OTP:", error);
 			res.status(500).json({ message: "Failed to send OTP" });
@@ -133,7 +131,7 @@ app.post("/auth/login", async (req: any, res: any) => {
 			errors.password = "Incorrect password";
 			return res.status(400).json({ errors });
 		}
-		return res.status(200).json({ message: "User Authenticated" });
+		return res.status(200).json({ message: "User Authenticated", id: user.id });
 	} catch (error) {
 		console.error("Login error:", error);
 		return res.status(500).json({ message: "Something went wrong" });

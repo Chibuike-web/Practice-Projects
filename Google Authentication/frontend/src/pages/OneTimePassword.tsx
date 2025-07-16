@@ -5,13 +5,13 @@ import { FormEvent, useRef, useState, KeyboardEvent, ClipboardEvent } from "reac
 import Button from "../components/Button";
 import { useParams } from "react-router";
 import { useLoading } from "../Hooks";
-import { useUser } from "../store/userStore";
 
 export default function OneTimePassword() {
 	const { id } = useParams<{ id: string }>();
 	if (!id) {
 		throw new Error("Missing ID in URL");
 	}
+
 	return (
 		<main className="w-full max-w-[500px] mx-auto mt-[88px]">
 			<Link to={`/verify-account/${id}`} className="flex items-center text-primary">
@@ -41,7 +41,6 @@ const OtpInputs = ({ id }: { id: string }) => {
 	const navigate = useNavigate();
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
-	const { updateUser } = useUser();
 
 	const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
 		e.preventDefault();
@@ -107,7 +106,6 @@ const OtpInputs = ({ id }: { id: string }) => {
 			const data = await res.json();
 			console.log(data.message);
 			setSuccess(data.message);
-			updateUser(data.id, data.isVerified);
 			setTimeout(() => navigate("/success"), 1000);
 			setValues([]);
 		} catch (err) {

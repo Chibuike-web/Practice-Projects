@@ -7,7 +7,6 @@ import Button from "../components/Button";
 import { GoogleIcon } from "../components/Icons";
 import { validateName, validateEmail, validatePassword, validateCheked } from "../validations";
 import { Link, useNavigate } from "react-router";
-import { useUser } from "../store/userStore";
 import { useLoading } from "../Hooks";
 
 export default function Signup() {
@@ -23,7 +22,6 @@ export default function Signup() {
 	const { isLoading, setIsLoading } = useLoading();
 
 	const navigate = useNavigate();
-	const { addUser } = useUser();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { id, value, checked: isChecked } = e.target;
@@ -94,7 +92,6 @@ export default function Signup() {
 			}
 			const data = await res.json();
 			console.log("Registration successful:", data.message);
-			addUser(data.user);
 
 			setRegistrationError("");
 			setName("");

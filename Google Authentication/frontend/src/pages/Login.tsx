@@ -27,9 +27,15 @@ export default function Login() {
 		const { id, value } = e.target;
 		switch (id) {
 			case "email":
+				if (errors.email) {
+					setErrors((prev) => ({ ...prev, email: "" }));
+				}
 				setEmail(value);
 				break;
 			case "password":
+				if (errors.password) {
+					setErrors((prev) => ({ ...prev, password: "" }));
+				}
 				setPassword(value);
 				break;
 		}
@@ -45,17 +51,17 @@ export default function Login() {
 				body: JSON.stringify(formData),
 			});
 
-			const data = await res.json();
-
 			if (!res.ok) {
-				setErrors(data.errors || { email: "", password: "" });
-			} else {
-				console.log(data.message);
-				setEmail("");
-				setPassword("");
-				setErrors({ email: "", password: "" });
-				navigate("/home");
+				const errorData = await res.json();
+				setErrors(errorData.errors || { email: "", password: "" });
+				return;
 			}
+			const data = await res.json();
+			console.log(data.message);
+			setEmail("");
+			setPassword("");
+			setErrors({ email: "", password: "" });
+			navigate(`/home/${data.id}`);
 		} catch (error: any) {
 			console.error(`Failed to authenticate: ${error.message}`);
 		}
