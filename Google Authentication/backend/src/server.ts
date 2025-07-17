@@ -8,6 +8,7 @@ import { sendEmailOTP } from "./emailOTP";
 import { sendPhoneOTP } from "./phoneOTP";
 
 dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 1234;
 
@@ -32,9 +33,8 @@ interface User {
 }
 const users: User[] = [];
 
-//Sending users
-
-app.get("/auth/users/:id", async (req: any, res: any) => {
+// Sending users
+app.get("/auth/users/:id", async (req: any, res) => {
 	const { id } = req.params;
 	const user = users.find((u) => u.id === id);
 	if (!user) {
@@ -45,7 +45,7 @@ app.get("/auth/users/:id", async (req: any, res: any) => {
 });
 
 // Register
-app.post("/auth/register", async (req: any, res: any) => {
+app.post("/auth/register", async (req: any, res) => {
 	try {
 		const { name, email, password, checked } = req.body;
 
@@ -76,7 +76,7 @@ app.post("/auth/register", async (req: any, res: any) => {
 	}
 });
 
-app.post("/auth/request-verification", async (req: any, res: any) => {
+app.post("/auth/request-verification", async (req, res) => {
 	const { id, method, phone } = req.body;
 	if (!["email", "phone"].includes(method)) {
 		return res.status(400).json({ message: "Invalid verification method" });
@@ -114,7 +114,7 @@ app.post("/auth/request-verification", async (req: any, res: any) => {
 	}
 });
 
-app.post("/auth/otp", async (req: any, res: any) => {
+app.post("/auth/otp", async (req, res) => {
 	const { id, otp } = req.body;
 	try {
 		const user = users.find((u) => u.id === id);
