@@ -3,7 +3,7 @@ import Button from "../components/Button";
 import { VerifyIcon, WarningIcon } from "../components/Icons";
 import { twMerge } from "tailwind-merge";
 import { Check } from "lucide-react";
-import { useLoading } from "../Hooks";
+import { useLoading, useUserMiddleware } from "../Hooks";
 import { useNavigate, useParams } from "react-router";
 
 export default function VerifyAccount() {
@@ -12,6 +12,9 @@ export default function VerifyAccount() {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const { isLoading, setIsLoading } = useLoading();
+
+	if (!id) return;
+	useUserMiddleware(id);
 
 	const handleSelect = (e: FormEvent, method: "email" | "phone") => {
 		e.preventDefault();
@@ -68,7 +71,14 @@ export default function VerifyAccount() {
 
 			if (!res.ok) {
 				const errorData = await res.json();
-				console.log(errorData.message);
+
+				if (res.status === 409 || errorData.message === "User has been verified") {
+					console.log("Redirecting to login because user is already verified.");
+					navigate("/login");
+				} else {
+					console.error("OTP request failed:", errorData.message);
+				}
+
 				return;
 			}
 

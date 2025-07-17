@@ -4,13 +4,15 @@ import { VerificationIcon } from "../components/Icons";
 import { FormEvent, useRef, useState, KeyboardEvent, ClipboardEvent } from "react";
 import Button from "../components/Button";
 import { useParams } from "react-router";
-import { useLoading } from "../Hooks";
+import { useLoading, useUserMiddleware } from "../Hooks";
 
 export default function OneTimePassword() {
 	const { id } = useParams<{ id: string }>();
 	if (!id) {
 		throw new Error("Missing ID in URL");
 	}
+
+	useUserMiddleware(id);
 
 	return (
 		<main className="w-full max-w-[500px] mx-auto mt-[88px]">

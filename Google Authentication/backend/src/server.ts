@@ -68,7 +68,7 @@ app.post("/auth/register", async (req: any, res: any) => {
 		};
 
 		users.push(newUser);
-		console.log(users);
+
 		return res.status(200).json({ message: "User Registered", user: newUser });
 	} catch (error) {
 		console.error("Registration error:", error);
@@ -78,8 +78,15 @@ app.post("/auth/register", async (req: any, res: any) => {
 
 app.post("/auth/request-verification", async (req: any, res: any) => {
 	const { id, method, phone } = req.body;
+	if (!["email", "phone"].includes(method)) {
+		return res.status(400).json({ message: "Invalid verification method" });
+	}
 	const user = users.find((u) => u.id === id);
 	if (!user) return res.status(404).json({ message: "User not found" });
+
+	if (user.isVerified) {
+		return res.status(409).json({ message: "User has been verified" });
+	}
 	const email = user.email;
 	if (method === "email") {
 		try {
@@ -101,7 +108,7 @@ app.post("/auth/request-verification", async (req: any, res: any) => {
 			await sendPhoneOTP(phone, otp);
 			res.status(200).json({ message: "OTP sent" });
 		} catch (error) {
-			console.error("Error sending email OTP:", error);
+			console.error("Error sending phone OTP:", error);
 			res.status(500).json({ message: "Failed to send OTP" });
 		}
 	}
@@ -109,18 +116,17 @@ app.post("/auth/request-verification", async (req: any, res: any) => {
 
 app.post("/auth/otp", async (req: any, res: any) => {
 	const { id, otp } = req.body;
-	console.log(otp);
 	try {
 		const user = users.find((u) => u.id === id);
 		const isOtpExist = user?.otp;
-		console.log(isOtpExist);
+
 		if (isOtpExist && isOtpExist !== otp) {
 			res.status(400).json({ message: "The OTP you entered is incorrect. Please try again." });
 		}
 		if (user) {
 			user.isVerified = true;
 		}
-		res.status(200).json({ message: "user verified", id: id, isVerified: user?.isVerified });
+		res.status(200).json({ message: "user verified", id: id });
 	} catch (error) {
 		console.error("Error verifying user:", error);
 		res.status(500).json({ message: "Failed to verify" });
@@ -143,6 +149,10 @@ app.post("/auth/login", async (req: any, res: any) => {
 			errors.password = "Incorrect password";
 			return res.status(400).json({ errors });
 		}
+		if (!user.isVerified) {
+			return res.status(409).json({ message: "User has not been verified" });
+		}
+
 		return res.status(200).json({ message: "User Authenticated", id: user.id });
 	} catch (error) {
 		console.error("Login error:", error);

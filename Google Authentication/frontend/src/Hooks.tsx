@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import { useUser } from "./store/useUserStore";
 
 export const useLoading = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -7,8 +8,10 @@ export const useLoading = () => {
 };
 
 export const useUserMiddleware = (id: string) => {
-	const [user, setUser] = useState(null);
+	const { user, setUser } = useUser();
 	const navigate = useNavigate();
+	const location = useLocation();
+
 	useEffect(() => {
 		const controller = new AbortController();
 
@@ -16,20 +19,15 @@ export const useUserMiddleware = (id: string) => {
 			try {
 				const res = await fetch(`http://localhost:1234/auth/users/${id}`);
 				if (!res.ok) {
-					console.log("First one");
 					navigate("/signup");
 					return;
 				}
 
 				const data = await res.json();
+
 				if (!data.user) {
 					console.log(data.user);
 					navigate("/signup");
-					return;
-				}
-
-				if (!data.user.isVerified) {
-					navigate(`/verify-account/${id}`);
 					return;
 				}
 
@@ -41,7 +39,7 @@ export const useUserMiddleware = (id: string) => {
 		}
 		checkUser();
 		return () => controller.abort();
-	}, [id, navigate]);
+	}, [id, navigate, location.pathname]);
 
 	return user;
 };
