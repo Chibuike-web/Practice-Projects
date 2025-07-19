@@ -45,7 +45,7 @@ app.get("/auth/users/:id", async (req: any, res) => {
 });
 
 // Register
-app.post("/auth/register", async (req: any, res) => {
+app.post("/auth/register", async (req, res) => {
 	try {
 		const { name, email, password, checked } = req.body;
 
@@ -133,7 +133,7 @@ app.post("/auth/otp", async (req, res) => {
 	}
 });
 
-app.post("/auth/login", async (req: any, res: any) => {
+app.post("/auth/login", async (req, res) => {
 	try {
 		const { email, password } = req.body;
 		const errors: Errors = { email: "", password: "" };
@@ -153,7 +153,7 @@ app.post("/auth/login", async (req: any, res: any) => {
 			return res.status(409).json({ message: "User has not been verified" });
 		}
 
-		return res.status(200).json({ message: "User Authenticated", id: user.id });
+		return res.status(200).json({ message: "User Authenticated", user: user });
 	} catch (error) {
 		console.error("Login error:", error);
 		return res.status(500).json({ message: "Something went wrong" });

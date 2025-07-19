@@ -98,6 +98,7 @@ export default function Signup() {
 			setEmail("");
 			setPassword("");
 			setChecked(false);
+			sessionStorage.setItem("user", JSON.stringify(data.user));
 			navigate(`/verify-account/${data.user.id}`);
 		} catch (error) {
 			console.error(`Failed to register: ${error}`);

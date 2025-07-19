@@ -61,7 +61,14 @@ export default function Login() {
 			setEmail("");
 			setPassword("");
 			setErrors({ email: "", password: "" });
-			navigate(`/home/${data.id}`);
+			const storedUser = sessionStorage.getItem("user");
+			if (storedUser) {
+				const user = JSON.parse(storedUser);
+				user.isVerified = true;
+
+				sessionStorage.setItem("user", JSON.stringify(user));
+			}
+			navigate(`/home/${data.user.id}`);
 		} catch (error: any) {
 			console.error(`Failed to authenticate: ${error.message}`);
 		}
