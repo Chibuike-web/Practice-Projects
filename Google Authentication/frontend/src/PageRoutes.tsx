@@ -13,9 +13,9 @@ export default function PageRoutes() {
 			<Route path="/" element={<Navigate to="/signup" replace />} />
 			<Route path="/signup" element={<Signup />} />
 			<Route path="/login" element={<Login />} />
-			<Route path="/home/:id" element={<Home />} />
-			<Route path="/verify-account/:id" element={<VerifyAccount />} />
-			<Route path="/otp/:id" element={<OneTimePassword />} />
+			<Route path="/home/" element={<Home />} />
+			<Route path="/verify-account/" element={<VerifyAccount />} />
+			<Route path="/otp/" element={<OneTimePassword />} />
 			<Route path="/success" element={<Success />} />
 			<Route path="*" element={<NotFound />} />
 		</Routes>

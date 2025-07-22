@@ -3,20 +3,16 @@ import { Link, useNavigate } from "react-router";
 import { VerificationIcon } from "../components/Icons";
 import { FormEvent, useRef, useState, KeyboardEvent, ClipboardEvent } from "react";
 import Button from "../components/Button";
-import { useParams } from "react-router";
-import { useLoading, useUserMiddleware } from "../Hooks";
+import { useLoading, useUser } from "../Hooks";
 
 export default function OneTimePassword() {
-	const { id } = useParams<{ id: string }>();
-	if (!id) {
-		throw new Error("Missing ID in URL");
-	}
+	const { user, parsedUser, loading } = useUser();
 
-	useUserMiddleware(id);
+	if (loading || !user || !parsedUser) return null;
 
 	return (
 		<main className="w-full max-w-[500px] mx-auto mt-[88px]">
-			<Link to={`/verify-account/${id}`} className="flex items-center text-primary">
+			<Link to={"/verify-account"} className="flex items-center text-primary">
 				<ChevronLeft />
 				Back
 			</Link>
@@ -29,7 +25,7 @@ export default function OneTimePassword() {
 							To ensure the security of your Kulipal account, we require account verification.
 						</p>
 					</div>
-					<OtpInputs id={id} />
+					<OtpInputs id={user.id} />
 				</div>
 			</section>
 		</main>
@@ -91,7 +87,6 @@ const OtpInputs = ({ id }: { id: string }) => {
 		e.preventDefault();
 		setError("");
 		const otp = values.join("");
-		console.log(otp);
 		setIsLoading(true);
 		try {
 			const res = await fetch("http://localhost:1234/auth/otp", {
@@ -101,12 +96,10 @@ const OtpInputs = ({ id }: { id: string }) => {
 			});
 			if (!res.ok) {
 				const errorData = await res.json();
-				console.log(errorData.message);
 				setError(errorData.message);
 				return;
 			}
 			const data = await res.json();
-			console.log(data.message);
 			setSuccess(data.message);
 			setTimeout(() => navigate("/success"), 1000);
 			setValues([]);

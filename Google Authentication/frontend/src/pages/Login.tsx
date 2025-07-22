@@ -53,24 +53,26 @@ export default function Login() {
 
 			if (!res.ok) {
 				const errorData = await res.json();
+
+				if (res.status === 409) {
+					alert(errorData.message);
+					navigate("/verify-account");
+					sessionStorage.setItem("user", JSON.stringify(errorData.user));
+					return;
+				}
 				setErrors(errorData.errors || { email: "", password: "" });
 				return;
 			}
 			const data = await res.json();
-			console.log(data.message);
+
 			setEmail("");
 			setPassword("");
 			setErrors({ email: "", password: "" });
-			const storedUser = sessionStorage.getItem("user");
-			if (storedUser) {
-				const user = JSON.parse(storedUser);
-				user.isVerified = true;
-
-				sessionStorage.setItem("user", JSON.stringify(user));
-			}
-			navigate(`/home/${data.user.id}`);
-		} catch (error: any) {
-			console.error(`Failed to authenticate: ${error.message}`);
+			sessionStorage.setItem("user", JSON.stringify(data.user));
+			localStorage.setItem("user", JSON.stringify(data.user));
+			navigate("/home");
+		} catch (error) {
+			console.error(`Failed to authenticate: ${error}`);
 		}
 	};
 	return (

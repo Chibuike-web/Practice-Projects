@@ -1,27 +1,41 @@
 import { useEffect, useState } from "react";
+import { User } from "./types";
 import { useNavigate } from "react-router";
-import { useUser } from "./store/useUserStore";
 
 export const useLoading = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	return { isLoading, setIsLoading };
 };
 
-export const useUserMiddleware = (id: string) => {
-	const { user, setUser } = useUser();
+export const useUser = () => {
+	const [user, setUser] = useState<User | null>(null);
+	const [parsedUser, setParsedUser] = useState<any | null>(null);
+	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const storedUser = sessionStorage.getItem("user");
-		const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-
-		if (!parsedUser || parsedUser.id !== id) {
+		if (!storedUser) {
 			navigate("/signup");
 			return;
 		}
+		const parsedSessionUser = JSON.parse(storedUser);
+		setUser(parsedSessionUser);
+	}, [navigate]);
 
-		setUser(parsedUser);
-	}, [id, navigate, setUser]);
+	useEffect(() => {
+		const storedUser = localStorage.getItem("user");
+		if (storedUser) {
+			const parsed = JSON.parse(storedUser);
+			setParsedUser(parsed);
 
-	return user;
+			if (parsed?.isVerified) {
+				navigate("/home");
+				return;
+			}
+		}
+		setLoading(false);
+	}, [navigate]);
+
+	return { user, parsedUser, loading };
 };

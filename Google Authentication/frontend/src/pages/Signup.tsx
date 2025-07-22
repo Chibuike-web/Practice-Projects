@@ -57,7 +57,6 @@ export default function Signup() {
 		setPasswordError(passwordErr || "");
 		setCheckedError(checkedErr || "");
 
-		// Stop submission if any errors
 		if (nameErr || emailErr || passwordErr || checkedErr) return;
 
 		const formData = { name, email, password, checked };
@@ -72,26 +71,24 @@ export default function Signup() {
 
 			if (!res.ok) {
 				const data = await res.json();
-				if (data.message) {
+				if (res.status === 400) {
 					setRegistrationError(data.message);
-					if (data.message.toLowerCase() === "user already exists") {
-						setName("");
-						setEmail("");
-						setPassword("");
-						setChecked(false);
-						if (!data.user.isVerified) {
-							navigate(`/verify-account/${data.user.id}`);
-						} else {
-							navigate("/login");
-						}
+				} else if (res.status === 409) {
+					setName("");
+					setEmail("");
+					setPassword("");
+					setChecked(false);
+					setRegistrationError(data.message);
+					sessionStorage.setItem("user", JSON.stringify(data.user));
+					if (!data.user.isVerified) {
+						navigate("/verify-account");
+					} else {
+						navigate("/login");
 					}
-
-					return;
 				}
 				throw new Error(data.message || "Registration failed");
 			}
 			const data = await res.json();
-			console.log("Registration successful:", data.message);
 
 			setRegistrationError("");
 			setName("");
@@ -99,7 +96,7 @@ export default function Signup() {
 			setPassword("");
 			setChecked(false);
 			sessionStorage.setItem("user", JSON.stringify(data.user));
-			navigate(`/verify-account/${data.user.id}`);
+			navigate("/verify-account");
 		} catch (error) {
 			console.error(`Failed to register: ${error}`);
 		} finally {
@@ -154,7 +151,7 @@ export default function Signup() {
 					OR
 					<span className="w-full bg-dark-gray/25 h-[0.5px] block " />
 				</div>
-				<Button variant="outline" className="gap-4" onClick={() => console.log("hmm")}>
+				<Button variant="outline" className="gap-4">
 					<GoogleIcon /> Sign up with Google
 				</Button>
 			</section>

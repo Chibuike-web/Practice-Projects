@@ -48,11 +48,14 @@ app.get("/auth/users/:id", async (req: any, res) => {
 app.post("/auth/register", async (req, res) => {
 	try {
 		const { name, email, password, checked } = req.body;
+		if (!name || !email || !password || !checked) {
+			return res.status(400).json({ message: "Missing Inputs" });
+		}
 
 		const existingUser = users.find((user) => user.email === email);
 		if (existingUser) {
 			console.log("User exists:", existingUser.email);
-			return res.status(400).json({ message: "user already exists", user: existingUser });
+			return res.status(409).json({ message: "user already exists", user: existingUser });
 		}
 
 		const saltRounds = 10;
@@ -150,7 +153,7 @@ app.post("/auth/login", async (req, res) => {
 			return res.status(400).json({ errors });
 		}
 		if (!user.isVerified) {
-			return res.status(409).json({ message: "User has not been verified" });
+			return res.status(409).json({ message: "User has not been verified", user: user });
 		}
 
 		return res.status(200).json({ message: "User Authenticated", user: user });

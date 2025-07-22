@@ -1,7 +1,11 @@
 import { SuccessIcon } from "../components/Icons";
 import Button from "../components/Button";
+import { useUser } from "../Hooks";
 
 export default function Success() {
+	const { user, parsedUser, loading } = useUser();
+
+	if (loading || !user || !parsedUser) return null;
 	return (
 		<main className="w-full max-w-[500px] mx-auto content-center h-screen justify-items-center ">
 			<SuccessIcon />

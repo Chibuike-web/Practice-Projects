@@ -3,18 +3,17 @@ import Button from "../components/Button";
 import { VerifyIcon, WarningIcon } from "../components/Icons";
 import { twMerge } from "tailwind-merge";
 import { Check } from "lucide-react";
-import { useLoading, useUserMiddleware } from "../Hooks";
-import { useNavigate, useParams } from "react-router";
+import { useLoading, useUser } from "../Hooks";
+import { useNavigate } from "react-router";
 
 export default function VerifyAccount() {
 	const [selectedMethod, setSelectedMethod] = useState<"email" | "phone" | null>(null);
 	const [phoneNumber, setPhoneNumber] = useState<string>("");
-	const { id } = useParams();
+
 	const navigate = useNavigate();
 	const { isLoading, setIsLoading } = useLoading();
 
-	if (!id) return;
-	useUserMiddleware(id);
+	const { user, parsedUser, loading } = useUser();
 
 	const handleSelect = (e: FormEvent, method: "email" | "phone") => {
 		e.preventDefault();
@@ -51,9 +50,10 @@ export default function VerifyAccount() {
 	};
 
 	async function handleRequestOTP() {
+		if (!user) return;
 		if (!selectedMethod) return;
 		const payload: any = {
-			id: id,
+			id: user.id,
 			method: selectedMethod,
 		};
 
@@ -84,7 +84,7 @@ export default function VerifyAccount() {
 
 			const data = await res.json();
 			console.log(data.message);
-			navigate(`/otp/${data.id}`);
+			navigate("/otp");
 		} catch (error) {
 			console.log("Issue fetching OTP", error);
 		} finally {
@@ -92,6 +92,7 @@ export default function VerifyAccount() {
 		}
 	}
 
+	if (loading || !user || !parsedUser) return;
 	return (
 		<main className="grid place-items-center h-screen px-4">
 			<div className="flex flex-col items-center w-full max-w-[500px]">
