@@ -104,6 +104,9 @@ export default function Signup() {
 		}
 	};
 
+	const googleAuth = async () => {
+		window.location.href = "http://localhost:1234/auth/google";
+	};
 	return (
 		<main className="h-screen w-screen content-center justify-items-center">
 			<section className="max-w-[500px] w-full flex flex-col px-4 md:px-0">
@@ -134,8 +137,20 @@ export default function Signup() {
 						<TermsCheckbox checked={checked} handleChange={handleChange} />
 						{checkedError && <p className="text-red-500 mt-[4px]">{checkedError}</p>}
 					</div>
-					<Button variant="primary" type="submit" className="mt-10">
-						{isLoading ? "Signing up..." : "Sign up"}
+					<Button
+						variant={!isLoading ? "primary" : "disabled"}
+						type="submit"
+						className="mt-10"
+						disabled={isLoading}
+					>
+						{isLoading ? (
+							<span className="flex gap-2 items-center justify-center">
+								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+								Sign up...
+							</span>
+						) : (
+							"Sign up"
+						)}
 					</Button>
 				</form>
 
@@ -151,7 +166,7 @@ export default function Signup() {
 					OR
 					<span className="w-full bg-dark-gray/25 h-[0.5px] block " />
 				</div>
-				<Button variant="outline" className="gap-4">
+				<Button variant="outline" className="gap-4" onClick={() => googleAuth()}>
 					<GoogleIcon /> Sign up with Google
 				</Button>
 			</section>

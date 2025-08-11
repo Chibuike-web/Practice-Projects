@@ -6,7 +6,7 @@ import Button from "../components/Button";
 import { useLoading, useUser } from "../Hooks";
 
 export default function OneTimePassword() {
-	const { user, parsedUser, loading } = useUser();
+	const { user, parsedUser, loading } = useUser(true);
 
 	if (loading || !user || !parsedUser) return null;
 
@@ -130,8 +130,18 @@ const OtpInputs = ({ id }: { id: string }) => {
 				))}
 			</legend>
 
-			<Button variant={values.every((value) => value !== "") ? "primary" : "disabled"}>
-				{isLoading ? "Verifying..." : "Verify"}
+			<Button
+				variant={values.every((value) => value !== "") && !isLoading ? "primary" : "disabled"}
+				disabled={isLoading}
+			>
+				{isLoading ? (
+					<span className="flex gap-2 items-center justify-center">
+						<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+						Verifying...
+					</span>
+				) : (
+					"Verify"
+				)}
 			</Button>
 			{error && (
 				<p className="mt-4 rounded-md bg-red-100 text-center text-red-700 px-4 py-3 border border-red-300">

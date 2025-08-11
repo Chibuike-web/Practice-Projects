@@ -13,7 +13,7 @@ export default function VerifyAccount() {
 	const navigate = useNavigate();
 	const { isLoading, setIsLoading } = useLoading();
 
-	const { user, parsedUser, loading } = useUser();
+	const { user, parsedUser, loading } = useUser(true);
 
 	const handleSelect = (e: FormEvent, method: "email" | "phone") => {
 		e.preventDefault();
@@ -92,7 +92,7 @@ export default function VerifyAccount() {
 		}
 	}
 
-	if (loading || !user || !parsedUser) return;
+	if (loading || !user || !parsedUser) return null;
 	return (
 		<main className="grid place-items-center h-screen px-4">
 			<div className="flex flex-col items-center w-full max-w-[500px]">
@@ -148,8 +148,16 @@ export default function VerifyAccount() {
 					className="mt-10"
 					variant={!isLoading && selectedMethod ? "primary" : "disabled"}
 					onClick={handleRequestOTP}
+					disabled={isLoading}
 				>
-					{isLoading ? "Verifying" : "Verify"}
+					{isLoading ? (
+						<span className="flex gap-2 items-center justify-center">
+							<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+							Verifying...
+						</span>
+					) : (
+						"Verify"
+					)}
 				</Button>
 			</div>
 		</main>

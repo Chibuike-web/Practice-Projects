@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
@@ -26,10 +26,11 @@ interface User {
 	id: string;
 	name: string;
 	email: string;
-	password: string;
+	password?: string;
 	checked: boolean;
 	isVerified: boolean;
 	otp?: string;
+	authProvider: "local" | "google";
 }
 const users: User[] = [];
 
@@ -68,6 +69,7 @@ app.post("/auth/register", async (req, res) => {
 			checked,
 			password: hashedPassword,
 			isVerified: false,
+			authProvider: "local",
 		};
 
 		users.push(newUser);
@@ -146,6 +148,13 @@ app.post("/auth/login", async (req, res) => {
 			return res.status(400).json({ errors });
 		}
 
+		if (!user.password) {
+			if (user.authProvider === "google") {
+				errors.email = "Please login using Google";
+				return res.status(400).json({ errors });
+			}
+			return;
+		}
 		const isMatch = await bcrypt.compare(password, user.password);
 
 		if (!isMatch) {
@@ -161,6 +170,48 @@ app.post("/auth/login", async (req, res) => {
 		console.error("Login error:", error);
 		return res.status(500).json({ message: "Something went wrong" });
 	}
+});
+
+app.get("/auth/google", (req: Request, res: Response) => {
+	const redirectUrl = process.env.REDIRECT_URL;
+	const clientId = process.env.GOOGLE_CLIENT_ID;
+	const scope = "openid profile email";
+	const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUrl}&scope=${encodeURIComponent(
+		scope
+	)}`;
+	res.redirect(authUrl);
+});
+app.get("/auth/google/callback", async (req, res) => {
+	const code = req.query.code as string;
+
+	const tokenRes = await fetch("https:/oauth2.googleapis.com/token", {
+		method: "POST",
+		headers: { "Content-Type": "application/x-www-form-urlencoded" },
+		body: new URLSearchParams({
+			code,
+			client_id: process.env.GOOGLE_CLIENT_ID!,
+			client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+			redirect_uri: process.env.REDIRECT_URL!,
+			grant_type: "authorization_code",
+		}),
+	});
+	const tokens = await tokenRes.json();
+	const userRes = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
+		headers: { Authorization: `Bearer ${tokens.access_token}` },
+	});
+	const user = await userRes.json();
+	const newUser: User = {
+		id: uuidv4(),
+		name: user.name,
+		email: user.email,
+		isVerified: user.email_verified,
+		checked: true,
+		authProvider: "google",
+	};
+	users.push(newUser);
+
+	const encodedUser = encodeURIComponent(JSON.stringify(newUser));
+	return res.redirect(`http://localhost:5173/oauth-success?user=${encodedUser}`);
 });
 
 app.listen(PORT, () => {

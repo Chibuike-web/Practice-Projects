@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import { FormEvent, useState } from "react";
 import { GoogleIcon } from "../components/Icons";
 import { Link, useNavigate } from "react-router";
+import { useLoading } from "../Hooks";
 
 interface FormErrors {
 	email: string;
@@ -17,6 +18,7 @@ interface FormData {
 
 export default function Login() {
 	const navigate = useNavigate();
+	const { isLoading, setIsLoading } = useLoading();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [errors, setErrors] = useState<FormErrors>({
@@ -44,6 +46,7 @@ export default function Login() {
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 		const formData: FormData = { email, password };
+		setIsLoading(true);
 		try {
 			const res = await fetch("http://localhost:1234/auth/login", {
 				method: "POST",
@@ -68,11 +71,12 @@ export default function Login() {
 			setEmail("");
 			setPassword("");
 			setErrors({ email: "", password: "" });
-			sessionStorage.setItem("user", JSON.stringify(data.user));
 			localStorage.setItem("user", JSON.stringify(data.user));
 			navigate("/home");
 		} catch (error) {
 			console.error(`Failed to authenticate: ${error}`);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 	return (
@@ -92,8 +96,20 @@ export default function Login() {
 						{errors.password && <p className="text-red-500 mt-[4px]">{errors.password}</p>}
 					</div>
 
-					<Button variant="primary" type="submit" className="mt-10">
-						Log in
+					<Button
+						variant={isLoading ? "disabled" : "primary"}
+						type="submit"
+						className="mt-10"
+						disabled={isLoading}
+					>
+						{isLoading ? (
+							<span className="flex gap-2 items-center justify-center">
+								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+								Logging in...
+							</span>
+						) : (
+							"Log in"
+						)}
 					</Button>
 				</form>
 				<div className="flex gap-[4px] justify-center mt-4">

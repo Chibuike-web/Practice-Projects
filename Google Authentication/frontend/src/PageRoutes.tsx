@@ -6,6 +6,7 @@ import { Routes, Route, Navigate } from "react-router";
 import VerifyAccount from "./pages/VerifyAccount";
 import OneTimePassword from "./pages/OneTimePassword";
 import Success from "./pages/Success";
+import OauthSuccess from "./pages/OauthSuccess";
 
 export default function PageRoutes() {
 	return (
@@ -17,6 +18,7 @@ export default function PageRoutes() {
 			<Route path="/verify-account/" element={<VerifyAccount />} />
 			<Route path="/otp/" element={<OneTimePassword />} />
 			<Route path="/success" element={<Success />} />
+			<Route path="/oauth-success" element={<OauthSuccess />} />
 			<Route path="*" element={<NotFound />} />
 		</Routes>
 	);

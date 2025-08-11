@@ -3,7 +3,7 @@ import Button from "../components/Button";
 import { useUser } from "../Hooks";
 
 export default function Success() {
-	const { user, parsedUser, loading } = useUser();
+	const { user, parsedUser, loading } = useUser(true);
 
 	if (loading || !user || !parsedUser) return null;
 	return (

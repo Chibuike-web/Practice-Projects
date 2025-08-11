@@ -1,13 +1,8 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useUser } from "../Hooks";
 
 export default function Home() {
-	const navigate = useNavigate();
-	useEffect(() => {
-		const storedUser = localStorage.getItem("user");
-		if (!storedUser) {
-			navigate("/signup");
-		}
-	}, []);
+	const { user, parsedUser, loading } = useUser();
+
+	if (loading || !user || !parsedUser) return null;
 	return <div>Home</div>;
 }
