@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import { serve } from "@hono/node-server";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -55,4 +56,7 @@ app.post("/api/translate", async (c) => {
 	}
 });
 
-export default app;
+const port = 4000;
+console.log(`🚀 Server is running at http://localhost:${port}`);
+
+serve({ fetch: app.fetch, port });
