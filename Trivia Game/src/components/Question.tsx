@@ -1,10 +1,15 @@
-import { useRef, useState } from "react";
-import type { QuizQuestion } from "../pages/Quiz";
+import { useRef } from "react";
 import shuffleArray from "../utils/shuffleArray";
 import { cn } from "../utils/cn";
+import { useSelectContext } from "../context/selectContext";
 
-export default function Question({ quiz }: { quiz: QuizQuestion }) {
-	const [selected, setSelected] = useState<string | null>(null);
+export default function Question() {
+	const { selected, setSelected, quiz } = useSelectContext();
+	const currentSelection = selected[quiz.question] ?? null;
+
+	const handleSelect = (answer: string) => {
+		setSelected((prev) => ({ ...prev, [quiz.question]: answer }));
+	};
 
 	const answersRef = useRef<string[]>([]);
 	if (answersRef.current.length === 0) {
@@ -37,15 +42,17 @@ export default function Question({ quiz }: { quiz: QuizQuestion }) {
 			/>
 			<ul className="flex flex-col gap-4 items-start mt-4">
 				{answers.map((answer, index) => {
-					const correctAnswerIndex = answers.findIndex((a) => a === quiz.correct_answer);
+					const correctAnswer = quiz.correct_answer;
+					const correctAnswerIndex = answers.findIndex((a) => a === correctAnswer);
 					const isCurrentAnswerCorrect = correctAnswerIndex === index;
+
 					return (
 						<li key={index} className="w-full">
 							<Button
 								answer={answer}
-								select={selected}
-								onSelect={setSelected}
-								quiz={quiz}
+								select={currentSelection}
+								onSelect={handleSelect}
+								correctAnswer={correctAnswer}
 								isCorrectAnswer={isCurrentAnswerCorrect}
 							/>
 						</li>
@@ -59,20 +66,20 @@ export default function Question({ quiz }: { quiz: QuizQuestion }) {
 const Button = ({
 	answer,
 	select,
-	quiz,
+	correctAnswer,
 	isCorrectAnswer,
 	onSelect,
 }: {
 	answer: string;
 	select: string | null;
-	quiz: QuizQuestion;
+	correctAnswer: string;
 	isCorrectAnswer: boolean;
 	onSelect: (value: string) => void;
 }) => {
-	const isCorrect = answer === quiz.correct_answer;
+	const isCorrect = answer === correctAnswer;
 	const isSelected = select !== null;
-	const isCorrectSelection = isSelected && select === quiz.correct_answer;
-	const isWrongSelection = isSelected && select != quiz.correct_answer;
+	const isCorrectSelection = isSelected && select === correctAnswer;
+	const isWrongSelection = isSelected && select != correctAnswer;
 
 	return (
 		<div>
@@ -89,12 +96,10 @@ const Button = ({
 				<span className="size-4 rounded-full border border-gray-500 flex items-center justify-center" />
 			</button>
 			{isWrongSelection && isCorrectAnswer && (
-				<p className="mt-2 text-red-500 font-medium">Wrong, the answer is {quiz.correct_answer}</p>
+				<p className="mt-2 text-red-500 font-medium">Wrong, the answer is {correctAnswer}</p>
 			)}
 			{isCorrectSelection && isCorrectAnswer && (
-				<p className="mt-2 text-green-700 font-medium">
-					Correct, the answer is {quiz.correct_answer}
-				</p>
+				<p className="mt-2 text-green-700 font-medium">Correct, the answer is {correctAnswer}</p>
 			)}
 		</div>
 	);

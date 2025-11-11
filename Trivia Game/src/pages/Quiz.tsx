@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchQuiz } from "../api/fetchQuiz";
 import { useState } from "react";
 import Question from "../components/Question";
+import { useNavigate } from "react-router";
+import SelectContextProvider from "../context/selectContext";
 
 export type QuizQuestion = {
 	type: string;
@@ -14,6 +16,7 @@ export type QuizQuestion = {
 
 export default function Quiz() {
 	const [current, setCurrent] = useState(1);
+	const navigate = useNavigate();
 
 	const { data, isPending, isError } = useQuery({
 		queryKey: ["quiz"],
@@ -29,7 +32,7 @@ export default function Quiz() {
 
 	const quizzes: QuizQuestion[] = data.results;
 
-	const quiz = quizzes[current];
+	const quiz = quizzes[current - 1];
 	return (
 		<main className="max-w-[600px] mx-auto flex items-center h-screen px-6 xl:px-0">
 			<div className="w-full">
@@ -53,13 +56,14 @@ export default function Quiz() {
 						<div></div>
 					</div>
 				</div>
-				<Question key={quiz.question} quiz={quiz} />
-
+				<SelectContextProvider quiz={quiz}>
+					<Question key={quiz.question} />
+				</SelectContextProvider>
 				<button
 					className="mt-10 w-full flex bg-blue-500 text-white h-11 rounded-full items-center justify-center cursor-pointer"
 					onClick={() => {
 						const next = Math.min(current + 1, 10);
-						setCurrent(next);
+						next >= 10 ? navigate("/result") : setCurrent(next);
 					}}
 				>
 					Next
