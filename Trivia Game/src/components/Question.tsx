@@ -2,9 +2,11 @@ import { useRef } from "react";
 import shuffleArray from "../utils/shuffleArray";
 import { cn } from "../utils/cn";
 import { useSelectContext } from "../context/selectContext";
+import { useQuizContext } from "../context/quizContext";
 
 export default function Question() {
-	const { selected, setSelected, quiz } = useSelectContext();
+	const { selected, setSelected } = useSelectContext();
+	const { quiz } = useQuizContext();
 	const currentSelection = selected[quiz.question] ?? null;
 
 	const handleSelect = (answer: string) => {
@@ -45,6 +47,8 @@ export default function Question() {
 					const correctAnswer = quiz.correct_answer;
 					const correctAnswerIndex = answers.findIndex((a) => a === correctAnswer);
 					const isCurrentAnswerCorrect = correctAnswerIndex === index;
+					const selectIndex = answers.findIndex((a) => a === currentSelection);
+					const isSelectIndex = selectIndex === index;
 
 					return (
 						<li key={index} className="w-full">
@@ -54,6 +58,7 @@ export default function Question() {
 								onSelect={handleSelect}
 								correctAnswer={correctAnswer}
 								isCorrectAnswer={isCurrentAnswerCorrect}
+								isSelectIndex={isSelectIndex}
 							/>
 						</li>
 					);
@@ -68,12 +73,14 @@ const Button = ({
 	select,
 	correctAnswer,
 	isCorrectAnswer,
+	isSelectIndex,
 	onSelect,
 }: {
 	answer: string;
 	select: string | null;
 	correctAnswer: string;
 	isCorrectAnswer: boolean;
+	isSelectIndex: boolean;
 	onSelect: (value: string) => void;
 }) => {
 	const isCorrect = answer === correctAnswer;
@@ -86,16 +93,20 @@ const Button = ({
 			<button
 				onClick={() => onSelect(answer)}
 				className={cn(
-					"px-6 py-4 flex items-center justify-between font-medium w-full border border-gray-200 rounded-full cursor-pointer disabled:opacity-50",
+					"px-6 py-4 flex items-center justify-between text-start font-medium w-full border border-gray-200 rounded-full cursor-pointer disabled:opacity-50",
 					isSelected && isCorrect && "text-green-900 border-green-500 bg-green-100",
-					isSelected && !isCorrect && "text-red-500 border-red-500 bg-red-100 cursor-not-allowed"
+					isSelected && !isCorrect && "text-red-500 border-red-500 bg-red-100 cursor-not-allowed",
+					isSelected &&
+						!isCorrect &&
+						isSelectIndex &&
+						"text-red-500 border-red-500 border-2 bg-red-100 cursor-not-allowed ring-4 ring-red-300"
 				)}
 				disabled={isSelected && !isCorrect}
 			>
-				<span>{answer}</span>
+				<span dangerouslySetInnerHTML={{ __html: answer }} />{" "}
 				<span className="size-4 rounded-full border border-gray-500 flex items-center justify-center" />
 			</button>
-			{isWrongSelection && isCorrectAnswer && (
+			{isWrongSelection && isSelectIndex && (
 				<p className="mt-2 text-red-500 font-medium">Wrong, the answer is {correctAnswer}</p>
 			)}
 			{isCorrectSelection && isCorrectAnswer && (

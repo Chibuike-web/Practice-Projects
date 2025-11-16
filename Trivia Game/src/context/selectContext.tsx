@@ -1,32 +1,22 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import type { QuizQuestion } from "../pages/Quiz";
 
 type SelectContextType = {
 	selected: Record<string, string | null>;
 	setSelected: React.Dispatch<React.SetStateAction<Record<string, string | null>>>;
-	quiz: QuizQuestion;
 };
 
-const selectContext = createContext<SelectContextType | null>(null);
+const SelectContext = createContext<SelectContextType | null>(null);
 
 export const useSelectContext = () => {
-	const context = useContext(selectContext);
-	if (!context) throw new Error("selectContext not provided");
+	const context = useContext(SelectContext);
+	if (!context) throw new Error("useSelectContext must be used inside SelectContextProvider");
 	return context;
 };
 
-export default function SelectContextProvider({
-	children,
-	quiz,
-}: {
-	children: ReactNode;
-	quiz: QuizQuestion;
-}) {
+export default function SelectContextProvider({ children }: { children: ReactNode }) {
 	const [selected, setSelected] = useState<Record<string, string | null>>({});
 
 	return (
-		<selectContext.Provider value={{ selected, setSelected, quiz }}>
-			{children}
-		</selectContext.Provider>
+		<SelectContext.Provider value={{ selected, setSelected }}>{children}</SelectContext.Provider>
 	);
 }

@@ -3,7 +3,7 @@ import { fetchQuiz } from "../api/fetchQuiz";
 import { useState } from "react";
 import Question from "../components/Question";
 import { useNavigate } from "react-router";
-import SelectContextProvider from "../context/selectContext";
+import QuizContextProvider from "../context/quizContext";
 
 export type QuizQuestion = {
 	type: string;
@@ -21,14 +21,20 @@ export default function Quiz() {
 	const { data, isPending, isError } = useQuery({
 		queryKey: ["quiz"],
 		queryFn: fetchQuiz,
-		staleTime: 1000 * 60 * 60,
-		gcTime: 1000 * 60 * 60,
+		staleTime: Infinity,
+		gcTime: Infinity,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+		refetchOnReconnect: false,
 	});
 
 	if (isPending) return <div className="grid place-items-center min-h-screen">Loading...</div>;
-
 	if (isError)
-		return <div className="grid place-items-center min-h-screen">Error loading images</div>;
+		return <div className="grid place-items-center min-h-screen">Error loading quiz</div>;
+
+	if (!data || !data.results || data.results.length === 0) {
+		return <div className="grid place-items-center min-h-screen">No quiz data found</div>;
+	}
 
 	const quizzes: QuizQuestion[] = data.results;
 
@@ -56,14 +62,14 @@ export default function Quiz() {
 						<div></div>
 					</div>
 				</div>
-				<SelectContextProvider quiz={quiz}>
+				<QuizContextProvider quiz={quiz}>
 					<Question key={quiz.question} />
-				</SelectContextProvider>
+				</QuizContextProvider>
 				<button
 					className="mt-10 w-full flex bg-blue-500 text-white h-11 rounded-full items-center justify-center cursor-pointer"
 					onClick={() => {
-						const next = Math.min(current + 1, 10);
-						next >= 10 ? navigate("/result") : setCurrent(next);
+						const next = Math.min(current + 1, 11);
+						next > 10 ? navigate("/result") : setCurrent(next);
 					}}
 				>
 					Next
