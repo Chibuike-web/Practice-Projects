@@ -93,15 +93,17 @@ const Button = ({
 			<button
 				onClick={() => onSelect(answer)}
 				className={cn(
-					"px-6 py-4 flex items-center justify-between text-start font-medium w-full border border-gray-200 rounded-full cursor-pointer disabled:opacity-50",
-					isSelected && isCorrect && "text-green-900 border-green-500 bg-green-100",
+					"px-6 py-4 flex items-center justify-between text-start font-medium w-full border border-gray-200 rounded-full cursor-pointer ",
+					isSelected &&
+						isCorrect &&
+						"text-green-900 border-green-500 bg-green-100 cursor-not-allowed",
 					isSelected && !isCorrect && "text-red-500 border-red-500 bg-red-100 cursor-not-allowed",
 					isSelected &&
 						!isCorrect &&
 						isSelectIndex &&
 						"text-red-500 border-red-500 border-2 bg-red-100 cursor-not-allowed ring-4 ring-red-300"
 				)}
-				disabled={isSelected && !isCorrect}
+				disabled={isSelected}
 			>
 				<span dangerouslySetInnerHTML={{ __html: answer }} />{" "}
 				<span className="size-4 rounded-full border border-gray-500 flex items-center justify-center" />
