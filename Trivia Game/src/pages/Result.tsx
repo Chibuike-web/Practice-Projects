@@ -3,19 +3,16 @@ import { useSelectContext } from "../context/selectContext";
 import { fetchQuiz } from "../api/fetchQuiz";
 import type { QuizQuestion } from "./Quiz";
 import { useMemo } from "react";
+import { useNavigate } from "react-router";
 
 export default function Result() {
-	const { selected } = useSelectContext();
-	console.log(selected);
-
+	const { selected, setSelected } = useSelectContext();
+	const navigate = useNavigate();
 	const { data, isPending, isError } = useQuery({
 		queryKey: ["quiz"],
 		queryFn: fetchQuiz,
 		staleTime: Infinity,
 		gcTime: Infinity,
-		refetchOnMount: false,
-		refetchOnWindowFocus: false,
-		refetchOnReconnect: false,
 	});
 
 	if (isPending) return <div className="grid place-items-center min-h-screen">Loading...</div>;
@@ -27,7 +24,6 @@ export default function Result() {
 	}
 
 	const quizzes: QuizQuestion[] = data.results;
-	console.log(data.results);
 
 	const correctResults = useMemo(() => {
 		return quizzes.filter((quiz) => {
@@ -75,6 +71,17 @@ export default function Result() {
 					</ul>
 				</div>
 			</div>
+			<button
+				className="mt-10 w-full flex bg-blue-500 text-white h-11 rounded-full items-center justify-center cursor-pointer"
+				onClick={() => {
+					setSelected({});
+					localStorage.removeItem("selected");
+					localStorage.removeItem("REACT_QUERY_OFFLINE_CACHE");
+					navigate("/");
+				}}
+			>
+				Start again
+			</button>
 		</main>
 	);
 }

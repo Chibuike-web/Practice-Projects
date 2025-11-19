@@ -23,9 +23,6 @@ export default function Quiz() {
 		queryFn: fetchQuiz,
 		staleTime: Infinity,
 		gcTime: Infinity,
-		refetchOnMount: false,
-		refetchOnWindowFocus: false,
-		refetchOnReconnect: false,
 	});
 
 	if (isPending) return <div className="grid place-items-center min-h-screen">Loading...</div>;
