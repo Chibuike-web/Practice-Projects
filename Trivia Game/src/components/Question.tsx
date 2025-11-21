@@ -52,7 +52,11 @@ export default function Question() {
 					const isSelectIndex = selectIndex === index;
 
 					return (
-						<li key={index} className="w-full">
+						<li
+							key={index}
+							className="w-full animate-slideFadeIn"
+							style={{ animationDelay: `${index * 100}ms` }}
+						>
 							<Button
 								answer={answer}
 								select={currentSelection}

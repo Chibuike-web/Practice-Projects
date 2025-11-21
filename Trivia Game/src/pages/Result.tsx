@@ -40,7 +40,7 @@ export default function Result() {
 		<main className="max-w-[600px] mx-auto px-6 py-20">
 			<div className="text-center">
 				<h1 className="text-3xl font-semibold mb-4">Your Result</h1>
-				<p className="text-lg text-gray-600 mb-8">
+				<p className="text-lg text-gray-600 mb-8 transition-transform duration-300 scale-100">
 					You scored {score} out of {total}
 				</p>
 

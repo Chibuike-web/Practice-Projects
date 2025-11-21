@@ -59,16 +59,18 @@ export default function Quiz() {
 				</div>
 				<div className="w-full h-2 bg-gray-200 rounded-full mt-6">
 					<div
-						className="h-full bg-blue-500 rounded-full transition-all"
+						className="h-full bg-blue-500 rounded-full transition-[width] duration-300"
 						style={{ width: `${(current / quizzes.length) * 100}%` }}
 					/>
 				</div>
 
-				<QuizContextProvider quiz={quiz}>
-					<Question key={quiz.question} />
-				</QuizContextProvider>
+				<div className="transition-opacity duration-300 opacity-100" key={quiz.question}>
+					<QuizContextProvider quiz={quiz}>
+						<Question />
+					</QuizContextProvider>
+				</div>
 				<button
-					className="mt-10 w-full flex bg-blue-500 text-white h-11 rounded-full items-center justify-center cursor-pointer disabled:opacity-50"
+					className="mt-10 w-full flex bg-blue-500 text-white h-11 rounded-full items-center justify-center cursor-pointer disabled:opacity-50 active:scale-95 transition-transform"
 					disabled={!select}
 					onClick={() => {
 						if (!select) return;
