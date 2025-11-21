@@ -78,8 +78,11 @@ export default function Result() {
 				onClick={() => {
 					setSelected({});
 					localStorage.removeItem("selected");
+					localStorage.removeItem("REACT_QUERY_OFFLINE_CACHE");
 					queryClient.invalidateQueries({ queryKey: ["quiz"] });
-					navigate("/");
+					setTimeout(() => {
+						navigate("/");
+					}, 500);
 				}}
 			>
 				Start again

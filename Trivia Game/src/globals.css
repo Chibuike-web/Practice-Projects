@@ -7,8 +7,7 @@ body {
 @keyframes slideFadeIn {
 	from {
 		opacity: 0;
-		transform: translateY(20px);
-		transition: all 500ms;
+		transform: translateY(50px);
 	}
 	to {
 		opacity: 1;
@@ -17,5 +16,5 @@ body {
 }
 
 .animate-slideFadeIn {
-	animation: slideFadeIn 0.25s ease-out;
+	animation: slideFadeIn 0.4s ease-in-out;
 }
