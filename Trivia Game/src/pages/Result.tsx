@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSelectContext } from "../context/selectContext";
 import { fetchQuiz } from "../api/fetchQuiz";
 import type { QuizQuestion } from "./Quiz";
@@ -8,6 +8,8 @@ import { useNavigate } from "react-router";
 export default function Result() {
 	const { selected, setSelected } = useSelectContext();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+
 	const { data, isPending, isError } = useQuery({
 		queryKey: ["quiz"],
 		queryFn: fetchQuiz,
@@ -76,7 +78,7 @@ export default function Result() {
 				onClick={() => {
 					setSelected({});
 					localStorage.removeItem("selected");
-					localStorage.removeItem("REACT_QUERY_OFFLINE_CACHE");
+					queryClient.invalidateQueries({ queryKey: ["quiz"] });
 					navigate("/");
 				}}
 			>

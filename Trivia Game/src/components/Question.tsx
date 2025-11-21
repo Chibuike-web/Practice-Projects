@@ -3,6 +3,7 @@ import shuffleArray from "../utils/shuffleArray";
 import { cn } from "../utils/cn";
 import { useSelectContext } from "../context/selectContext";
 import { useQuizContext } from "../context/quizContext";
+import { CircleCheckBig, CircleX } from "lucide-react";
 
 export default function Question() {
 	const { selected, setSelected } = useSelectContext();
@@ -83,7 +84,7 @@ const Button = ({
 	isSelectIndex: boolean;
 	onSelect: (value: string) => void;
 }) => {
-	const isCorrect = answer === correctAnswer;
+	const isCorrectButton = answer === correctAnswer;
 	const isSelected = select !== null;
 	const isCorrectSelection = isSelected && select === correctAnswer;
 	const isWrongSelection = isSelected && select != correctAnswer;
@@ -95,18 +96,25 @@ const Button = ({
 				className={cn(
 					"px-6 py-4 flex items-center justify-between text-start font-medium w-full border border-gray-200 rounded-full cursor-pointer ",
 					isSelected &&
-						isCorrect &&
-						"text-green-900 border-green-500 bg-green-100 cursor-not-allowed",
-					isSelected && !isCorrect && "text-red-500 border-red-500 bg-red-100 cursor-not-allowed",
+						isCorrectButton &&
+						"text-green-900 border-green-500  bg-green-100 cursor-not-allowed",
 					isSelected &&
-						!isCorrect &&
+						!isCorrectButton &&
+						"text-red-500 border-red-500 bg-red-100 cursor-not-allowed",
+					isSelected &&
+						!isCorrectButton &&
 						isSelectIndex &&
 						"text-red-500 border-red-500 border-2 bg-red-100 cursor-not-allowed ring-4 ring-red-300"
 				)}
 				disabled={isSelected}
 			>
-				<span dangerouslySetInnerHTML={{ __html: answer }} />{" "}
-				<span className="size-4 rounded-full border border-gray-500 flex items-center justify-center" />
+				<span dangerouslySetInnerHTML={{ __html: answer }} />
+
+				{isSelected && !isCorrectButton ? (
+					<CircleX className="size-4" />
+				) : isSelected && isCorrectButton ? (
+					<CircleCheckBig className="size-4" />
+				) : null}
 			</button>
 			{isWrongSelection && isSelectIndex && (
 				<p className="mt-2 text-red-500 font-medium">Wrong, the answer is {correctAnswer}</p>

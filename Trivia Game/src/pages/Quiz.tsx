@@ -4,6 +4,7 @@ import { useState } from "react";
 import Question from "../components/Question";
 import { useNavigate } from "react-router";
 import QuizContextProvider from "../context/quizContext";
+import { useSelectContext } from "../context/selectContext";
 
 export type QuizQuestion = {
 	type: string;
@@ -17,6 +18,7 @@ export type QuizQuestion = {
 export default function Quiz() {
 	const [current, setCurrent] = useState(1);
 	const navigate = useNavigate();
+	const { selected } = useSelectContext();
 
 	const { data, isPending, isError } = useQuery({
 		queryKey: ["quiz"],
@@ -36,6 +38,8 @@ export default function Quiz() {
 	const quizzes: QuizQuestion[] = data.results;
 
 	const quiz = quizzes[current - 1];
+	const select = selected[quiz.question];
+
 	return (
 		<main className="max-w-[600px] mx-auto flex items-center h-screen px-6 xl:px-0">
 			<div className="w-full">
@@ -44,8 +48,7 @@ export default function Quiz() {
 						className="disabled:opacity-50 cursor-pointer"
 						disabled={current <= 1}
 						onClick={() => {
-							const prev = Math.max(current - 1, 1);
-							setCurrent(prev);
+							current > 1 && setCurrent(current - 1);
 						}}
 					>
 						Back
@@ -54,19 +57,26 @@ export default function Quiz() {
 						{current}/{quizzes.length}
 					</p>
 				</div>
-				<div>
-					<div>
-						<div></div>
-					</div>
+				<div className="w-full h-2 bg-gray-200 rounded-full mt-6">
+					<div
+						className="h-full bg-blue-500 rounded-full transition-all"
+						style={{ width: `${(current / quizzes.length) * 100}%` }}
+					/>
 				</div>
+
 				<QuizContextProvider quiz={quiz}>
 					<Question key={quiz.question} />
 				</QuizContextProvider>
 				<button
-					className="mt-10 w-full flex bg-blue-500 text-white h-11 rounded-full items-center justify-center cursor-pointer"
+					className="mt-10 w-full flex bg-blue-500 text-white h-11 rounded-full items-center justify-center cursor-pointer disabled:opacity-50"
+					disabled={!select}
 					onClick={() => {
-						const next = Math.min(current + 1, 11);
-						next > 10 ? navigate("/result") : setCurrent(next);
+						if (!select) return;
+						if (current >= 10) {
+							navigate("/result");
+							return;
+						}
+						setCurrent(current + 1);
 					}}
 				>
 					Next
