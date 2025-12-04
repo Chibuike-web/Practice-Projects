@@ -5,8 +5,10 @@ import Question from "../components/Question";
 import { useNavigate } from "react-router";
 import QuizContextProvider from "../context/quizContext";
 import { useSelectContext } from "../context/selectContext";
+import shuffleArray from "../utils/shuffleArray";
 
 export type QuizQuestion = {
+	shuffled: string[];
 	type: string;
 	difficulty: string;
 	category: string;
@@ -37,7 +39,11 @@ export default function Quiz() {
 
 	const quizzes: QuizQuestion[] = data.results;
 
-	const quiz = quizzes[current - 1];
+	const shuffledQuizzes = quizzes.map((q) => ({
+		...q,
+		shuffled: shuffleArray([...q.incorrect_answers, q.correct_answer]),
+	}));
+	const quiz = shuffledQuizzes[current - 1];
 	const select = selected[quiz.question];
 
 	return (

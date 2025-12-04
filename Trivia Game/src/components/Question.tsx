@@ -1,5 +1,3 @@
-import { useRef } from "react";
-import shuffleArray from "../utils/shuffleArray";
 import { cn } from "../utils/cn";
 import { useSelectContext } from "../context/selectContext";
 import { useQuizContext } from "../context/quizContext";
@@ -14,11 +12,7 @@ export default function Question() {
 		setSelected((prev) => ({ ...prev, [quiz.question]: answer }));
 	};
 
-	const answersRef = useRef<string[]>([]);
-	if (answersRef.current.length === 0) {
-		answersRef.current = shuffleArray([...quiz.incorrect_answers, quiz.correct_answer]);
-	}
-	const answers = answersRef.current;
+	const answers = quiz.shuffled;
 
 	return (
 		<div className="mt-10 flex flex-col gap-4">
@@ -28,7 +22,8 @@ export default function Question() {
 				{(["type", "difficulty", "category"] as const).map((item, i) => (
 					<span
 						key={i}
-						className="px-2 py-1 text-xs font-medium bg-gray-200 text-gray-800 rounded-full"
+						className="px-2 py-1 text-xs font-medium bg-gray-200 text-gray-800 rounded-full animate-slideFadeIn"
+						style={{ animationDelay: "100ms" }}
 					>
 						{item === "category"
 							? quiz[item].split(/[:;]/)[0].toLowerCase()
@@ -40,7 +35,8 @@ export default function Question() {
 			{/* question */}
 
 			<h1
-				className="text-[24px] font-semibold"
+				className="text-[24px] font-semibold animate-slideFadeIn"
+				style={{ animationDelay: "150ms" }}
 				dangerouslySetInnerHTML={{ __html: quiz.question }}
 			/>
 			<ul className="flex flex-col gap-4 items-start mt-4">
@@ -55,7 +51,7 @@ export default function Question() {
 						<li
 							key={index}
 							className="w-full animate-slideFadeIn"
-							style={{ animationDelay: `${index * 100}ms` }}
+							style={{ animationDelay: `${index * 10}ms` }}
 						>
 							<Button
 								answer={answer}
